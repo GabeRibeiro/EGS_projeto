@@ -1,0 +1,90 @@
+swagger: "2.0"
+info:
+  description: "This service provides the handling of generic notifications."
+  version: "0.1"
+  title: "Notification Service"
+host: "host"
+basePath: "/api/v1"
+
+tags:
+  - name: "notification"
+    description: "Handle Notifications"
+
+schemes:
+  - "https"
+
+paths:
+
+  /:
+    get:
+      tags:
+        - "notification"
+      summary: "Socket.io endpoint"
+      operationId: "receiveNotification"
+      produces:
+        - "application/json"
+      responses:
+        "400":
+          description: "Invalid uid"
+
+  /notification:
+    post:
+      tags:
+        - "notification"
+      summary: ""
+      description: ""
+      operationId: "sendNotification"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: ""
+          required: true
+          schema:
+            $ref: "#/definitions/Notification"
+      responses:
+        "400":
+          description: "Invalid uid"
+
+  /notifications:
+    get:
+      tags:
+        - "notification"
+      summary: "User's notification log (persisted notifications)"
+      description: ""
+      operationId: "getNotifications"
+      produces:
+        - "application/json"
+      responses:
+        "400":
+          description: "Invalid uid"
+
+definitions:
+  NotificationOptions:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+      number:
+        type: "integer"
+      persist:
+        type: "boolean"
+        default: false
+
+  Notification:
+    type: "object"
+    required:
+      - text
+      - uid
+    properties:
+      text:
+        type: "string"
+      uid:
+        type: "integer"
+      options:
+        $ref: "#/definitions/NotificationOptions"
+
+
