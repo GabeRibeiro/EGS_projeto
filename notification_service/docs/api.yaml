@@ -1,8 +1,9 @@
 swagger: "2.0"
 info:
   description: "This service provides the handling of generic notifications."
-  version: "0.1"
+  version: "0.2"
   title: "Notification Service"
+
 host: "host"
 basePath: "/api/v1"
 
@@ -51,16 +52,49 @@ paths:
 
   /notifications:
     get:
+      security:
+        - ApiKeyAuth: [ ]
       tags:
         - "notification"
       summary: "User's notification log (persisted notifications)"
-      description: ""
+      description: "Returns the user's notification log,the results can be paginated (off by default) by sending a PaginationOptions"
       operationId: "getNotifications"
+      consumes:
+        - "application/json"
       produces:
         - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Pagination options (Sending an Options schema enables it)"
+          required: false
+          schema:
+            $ref: "#/definitions/PaginationOptions"
       responses:
-        "400":
-          description: "Invalid uid"
+        "200":
+          description: "User's notifications"
+          schema:
+            type: object
+            properties:
+              uid:
+                type: "integer"
+                description: "User's ID."
+              pid:
+                type: "integer"
+                default: -1
+                description: "Id given to the notification when is sent with persist=true. Equal between normal and push notification."
+              txt:
+                type: "string"
+                description: "Notification's content."
+
+        "401":
+          description: Authorization information is missing or invalid.
+
+securityDefinitions:
+  ApiKeyAuth:
+    type: apiKey
+    in: header
+    name: Authorization
 
 definitions:
   NotificationOptions:
@@ -86,5 +120,18 @@ definitions:
         type: "integer"
       options:
         $ref: "#/definitions/NotificationOptions"
+
+  PaginationOptions:
+    type: "object"
+    required:
+      - nrPages
+      - resultsPerPage
+    properties:
+      nrPages:
+        type: "integer"
+        minimum: 1
+      resultsPerPage:
+        type: "integer"
+        minimum: 1
 
 

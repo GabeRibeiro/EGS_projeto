@@ -41,10 +41,10 @@ To build and start server:
 
 
 ## Todo:
+- [ ] Integration of auth service
 - [ ] Email notification
 - [ ] Phone Text notification
-- [ ] Notification Persistence Pagination
-- [ ] Integration of auth service
+- [x] Notification Persistence Pagination
 - [ ] Docker image and docker compose files
 - [ ] Improve documentation
 - [ ] Improve logging

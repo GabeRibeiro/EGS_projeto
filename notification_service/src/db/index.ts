@@ -39,12 +39,30 @@ export const insertDormantNotificationModel = async (n: NotificationModel): Prom
 }
 
 // todo: pagination
-export const getNotifications = async (uid:number): Promise<NotificationModel[]> => {
+export const getNotifications = async (uid:number, nrPage?:number, resultsPerPage?:number): Promise<NotificationModel[]> => {
+    let lastIdx = 0;
+
+    try {
+        lastIdx = (await pool.query("select id from notification where uid=$1 order by id desc limit 1;", [uid])).rows[0].id;
+    } catch (e) {
+        console.log("@getNotifications err: "+e)
+    }
+
     try{
-        const result = await pool.query("Select * from notificationQueue where uid=$1", [uid]);
+        const params = [uid];
+        let wherePart ="";
+        let limitPart = ""
+
+        if(nrPage >= 1 && resultsPerPage >= 1) {
+            wherePart = `and id <= $2`;  params.push(lastIdx-(nrPage-1)*resultsPerPage);
+            limitPart = "limit $3";  params.push(resultsPerPage);
+        }
+
+        const query = `Select * from notification where uid=$1 ${wherePart} order by id desc ${limitPart}`;
+        const result = await pool.query(query, params);
         return result.rows.map(r => new NotificationModel(r.uid, r.id, r.msg));
     } catch (e) {
-        return null;
+        throw e;
     }
 }
 

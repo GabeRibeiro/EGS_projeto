@@ -71,3 +71,27 @@ felem.onclick = ev => {
         body: JSON.stringify(data),
     }).catch(console.error);
 }
+
+document.getElementById('submit_pag').onclick = ev => {
+    ev.preventDefault();
+
+    const myHeaders = new Headers();
+    myHeaders.append('Authorization', document.getElementById("uid").value);
+
+    var url = new URL(apiHost+`/notifications`);
+
+    var params = {
+        nrPage: document.getElementById("pageNr").value,
+        resultsPerPage: document.getElementById("resultperpage").value,
+    }
+
+    url.search = new URLSearchParams(params).toString();
+
+    // cant use body with get
+    fetch(url, {
+        headers: myHeaders,
+    })
+        .then(res => res.json())
+        .then(console.log)
+        .catch(console.error);
+}

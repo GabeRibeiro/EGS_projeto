@@ -47,7 +47,7 @@ export async  function sendText(msgText: string, recipient:number) {
 }
 
 export const persistNotification = async (notification:NotificationDto): Promise<NotificationModel> => {
-        return await insertNotification(notification.uid, null);
+        return await insertNotification(notification.uid, notification.text);
 }
 
 export async function notifyQueue(notification:NotificationModel) {
