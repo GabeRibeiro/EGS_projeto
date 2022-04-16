@@ -42,7 +42,7 @@ To build and start server:
 
 ## Todo:
 - [ ] Integration of auth service
-- [ ] Email notification
+- [x] Email notification
 - [ ] Phone Text notification
 - [x] Notification Persistence Pagination
 - [ ] Docker image and docker compose files
