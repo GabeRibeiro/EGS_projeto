@@ -38,7 +38,6 @@ export const insertDormantNotificationModel = async (n: NotificationModel): Prom
     return insertDormantNotification(n.uid, n.txt, n.pid);
 }
 
-// todo: pagination
 export const getNotifications = async (uid:number, nrPage?:number, resultsPerPage?:number): Promise<NotificationModel[]> => {
     let lastIdx = 0;
 

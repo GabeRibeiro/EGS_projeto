@@ -10,12 +10,12 @@ export const notificationController: RequestHandler = async (req, res) => {
     let pid =-1;
 
     if(options.email) {
-        console.log("@notificationController: sendinf email");
-        await sendEmail(notification.text, options.email).then();
+        console.log("@notificationController: sending email");
+        await sendEmail(notification.text, options.email);
     }
 
     if (options.phoneNumber) {
-        console.log("@notificationController: sendinf text");
+        console.log("@notificationController: sending text");
         await sendText(notification.text, options.phoneNumber);
     }
 

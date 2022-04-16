@@ -1,7 +1,7 @@
 swagger: "2.0"
 info:
   description: "This service provides the handling of generic notifications."
-  version: "0.2"
+  version: "0.3"
   title: "Notification Service"
 
 host: "host"

@@ -1,5 +1,5 @@
 # Notification Service
-v0.1
+v0.3
 
 This service provides the handling of generic notifications.
 
