@@ -7,7 +7,8 @@ OpenApi description is available [here](./docs/api.yaml).
 
 ## Features
 - Real time push notification support (with message queue support)
-- Notification Persistence
+- Notification Persistence (with pagination support)
+- Email Notification
 
 ### Push Notifications
 Push notifications are implemented using the Socket.IO library, as such, integration with a push notification client is relatively trivial.
@@ -15,9 +16,7 @@ Push notifications are implemented using the Socket.IO library, as such, integra
 In the folder [fe_sdk](./fe_sdk) theres is an example of usage.
 
 ### Not yet implemented
-- Email Notification
 - Phone Text Notification
-- Notification Persistence Pagination
 
 
 ## Execution
