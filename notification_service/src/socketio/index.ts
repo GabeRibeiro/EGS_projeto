@@ -32,7 +32,8 @@ export const isUserConnected = (uid: number) => {
 }
 
 export const notifyUser = async (uid:number, n:NotificationModel) => {
-    const socket = ioSocketMap.get(uid);
+    const socket = ioSocketMap.get(Number(uid));
+
     if (socket) {
         socket.emit(SocketEvents.NewNotification, n);
         return true;
