@@ -362,6 +362,8 @@ def api_url():
     data = Query.get_url(request.form.get('url'),request.form.get('user_id'))
     return json.dumps(data),201
 
+
+"""
 @app.route('/URL/Filter/Interval',methods=['GET'])
 @token_required 
 def api_interval():
@@ -389,7 +391,7 @@ def api_min():
 @app.route('/URL/Filter/Max',methods=['GET'])
 @token_required 
 def api_max():
-
+"""
 
 @app.route('/',methods=['GET'])
 def home():
