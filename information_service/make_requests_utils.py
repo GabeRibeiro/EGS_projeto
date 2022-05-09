@@ -5,57 +5,32 @@ from datetime import datetime as dt
 
 tokens = {}
 
-def make_requests(val):
-    
-    # ver o tipo de auth do url
-    # dependendo do valor fazer o pedido, formatar e guardar na DB
-    
-    return 
-
-
-def format_influx(metric_id,data):
-    result = []
-    for entry in [entry for entry in data if entry]:
-        add_entry = {"measurement":metric_id,"tags":{'id':metric_id}}
-        
-        if 'Timestamp' in entry:
-            add_entry['time'] = dt.fromtimestamp(entry['Timestamp']).isoformat()
-            del entry['Timestamp']
-        else:
-            add_entry['time'] = str(get_timestamp())
-        
-        for key in [key for key in entry if isinstance(entry[key],str)]:
-            add_entry['tags'][key] = entry[key]
-            del entry[key]
-
-        if entry:
-            add_entry['fields'] = entry
-            result.append(add_entry)
-
-    return result 
-
-def request_basic(url):
+def request_basic(val):
     print('STARTING BASIC\n')
-    request = requests.get(url,timeout=40)
+    request = requests.get(val.url,timeout=40)
     if request.status_code == 200: 
-        for val in Query.get_basic_args(url):
-            args = [arg.strip() for arg in val[0].split(',')] if val[0] else 1
-            url_id = val[1]
-            print(url,args,url_id)
-            try:
-                db_entrys = format_influx(val[1],merge_filter(request.json(),args))
-                if db_entrys:
-                    try:
-                        for entry in db_entrys:
-                            Query.add_values(url_id,entry,datetime.datetime())
-                    except:
-                        print('writing values failed')
-                else:
-                    Query.pause_basic(val[1])
-                    print('BAD FORMAT BASIC')
-            except:
+        #try:
+        if True:
+            db_entrys = filter_entrys(request.json(),val.tag,val.value)
+            if db_entrys:
+                #try:
+                print('entrys')
+                print(request.json())
+                print('\n\n')
+                print(db_entrys)
+                print('\n')
+                for entry in [entry for entry in db_entrys if entry]:
+                    print(entry)
+                    
+                    Query.add_values(val.metric_id,entry[0],entry[1])
+                #except:
+                #    print('writing values failed')
+            else:
                 Query.pause_basic(val[1])
-                print("FILTER FAILED")         
+                print('BAD FORMAT BASIC')
+        #except:
+        #    Query.pause_basic(val[1])
+        #    print("FILTER FAILED")         
     
     elif request.status_code == 401:
         for val in Query.get_basic_args(url):
@@ -78,19 +53,20 @@ def request_basic(url):
         
     return False
 
-def request_key(val):       
+def request_key(val,key):       
     print('STARTING KEY\n')
     
-    request = requests.get(val.url,headers={'Authorization': val.key},timeout=40)
+    request = requests.get(val.url,headers={'Authorization': key},timeout=40)
     if request.status_code < 400:
             args = [arg.strip() for arg in val.args.split(',')] if val.args else 1
             print(val.url,args)
             try:
-                db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
+                db_entrys = filter_entrys(request.json(),val.tag,val.value)
                 if db_entrys:
                     try:
                         for entry in db_entrys:
-                            Query.add_values(val.metric_id,entry,datetime.datetime())
+                            print(entry)
+                            Query.add_values(val.metric_id,entry[0],entry[1],datetime.datetime())
                     except:
                         print('writing values failed')
                 else:
@@ -117,22 +93,18 @@ def request_key(val):
         
     return False
 
-def request_http(val):  
+def request_http(val,username,key):  
     print('STARTING HTTP\n')
     
-    request = requests.get(val.url,headers={"userName": val.username , "password": val.key},timeout=40)
+    request = requests.get(val.url,headers={"username": username , "password": key},timeout=40)
     if request.status_code < 400:    
-        args = [arg.strip() for arg in val.args.split(',')] if val.args else 1
-        print(val.url,args)
         try:
-            db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
-            print('entrys')
-            print(db_entrys)
-            print('\n')
+            db_entrys = filter_entrys(request.json(),val.tag,val.value)
+
             if db_entrys:
                 try:
                     for entry in db_entrys:
-                        Query.add_values(val.metric_id,entry,datetime.datetime())
+                        Query.add_values(val.metric_id,entry[0],entry[1],datetime.datetime())
                 except:
                     print('writing values failed')
             else:
@@ -159,16 +131,16 @@ def request_http(val):
         
     return False
         
-def request_token(val):
+def request_token(val,token_url,key,secret,content_type,auth_type):
     print('STARTING TOKEN\n')
-    msg = encode_b64(val.key+':'+val.secret)
+    msg = encode_b64(key+':'+secret)
     
     if val.metric_id in tokens:
         token = tokens[val.metric_id]
     else:
-        request = requests.post(val.token_url,headers={'Content-Type': val.content_type, 'Authorization': 'Basic '+msg},timeout=15)
+        request = requests.post(token_url,headers={'Content-Type': content_type, 'Authorization': 'Basic '+msg},timeout=15)
         if request.status_code<300:
-            token = val.auth_type + ' ' + request.json()['access_token']
+            token = auth_type + ' ' + request.json()['access_token']
             tokens[val.metric_id] = token
         elif request.status_code == 401:
             Query.pause_token(val.metric_id)
@@ -194,8 +166,8 @@ def request_token(val):
         
     request = requests.get(val.url,headers={'Authorization': token},timeout=40)
     if request.status_code == 401 and val.period<60:
-        request = requests.post(val.token_url,headers={'Content-Type': val.content_type, 'Authorization': 'Basic '+msg},timeout=15)
-        token = val.auth_type + ' ' + request.json()['access_token']
+        request = requests.post(token_url,headers={'Content-Type': content_type, 'Authorization': 'Basic '+msg},timeout=15)
+        token = auth_type + ' ' + request.json()['access_token']
         tokens[val.metric_id] = token
         request = requests.get(val.url,headers={'Authorization': token},timeout=40)
     
@@ -203,11 +175,11 @@ def request_token(val):
         args = [arg.strip() for arg in val.args.split(',')] if val.args else 1
         print(val.url,args)
         try:
-            db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
+            db_entrys = filter_entrys(request.json(),val.tag,val.value)
             if db_entrys:
                 try:
                     for entry in db_entrys:
-                        Query.add_values(val.metric_id,entry,datetime.datetime())
+                        Query.add_values(val.metric_id,entry[0],entry[1],datetime.datetime())
                 except:
                     print('writing values failed')
             else:

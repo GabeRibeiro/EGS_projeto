@@ -5,7 +5,7 @@ from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.expression import func
 import json
 import jwt
-import datetime
+from datetime import datetime
 from functools import wraps
 
 
@@ -61,7 +61,7 @@ class Token_url(db.Model):
 class Value(db.Model):
     __tablename__ = "value"
     url_id = db.Column(db.Integer,db.ForeignKey('basic_url.metric_id', ondelete="CASCADE"))
-    timestamp = db.Column(db.DateTime,primary_key=True)
+    timestamp = db.Column(db.DateTime,primary_key=True,default=datetime.utcnow)
     tag = db.Column(db.String(100),primary_key=True)
     value = db.Column(db.Float)
     def __repr__(self):
@@ -100,15 +100,23 @@ class Query:
         return db.session.query(Basic_url.metric_id,Basic_url.url,Basic_url.tag,Basic_url.value,Basic_url.status,Basic_url.period).filter(user_id=user_id)
     def get_url_info(user_id):
         return db.session.query(Basic_url).join(Token_url,Http_url,Key_url).filter(Basic_url.user_id==user_id).all()
-    def get_token():
+    def get_tokens():
         return db.session.query(Token_url.metric_id).all()
     def num_metrics():
         return db.session.query(func.max(Basic_url.metric_id))
     
     def get_url_request(freq):
         return db.session.query(Basic_url).filter(Basic_url.status==True,Basic_url.period==freq).all()
+    def get_requests_period(freq):
+        return db.session.query(Basic_url).filter(Basic_url.status==True,Basic_url.period==freq and Basic_url.user_id == user_id).all()
     def get_basic_period(freq,user_id):
         return db.session.query(Basic_url).filter(Basic_url.status==True,Basic_url.period==freq and Basic_url.user_id == user_id).all()
+    def get_key(metric_id):
+        return db.session.query(Key_url).filter(Key_url.metric_id == metric_id).scalar()
+    def get_http(metric_id):
+        return db.session.query(Http_url).filter(Http_url.metric_id == metric_id).scalar()
+    def get_token(metric_id):
+        return db.session.query(Token_url).filter(Token_url.metric_id == metric_id).scalar()
     def get_basic_args(val):
         return db.session.query(Basic_url.tag,Basic_url.value,Basic_url.metric_id).filter(Basic_url.url==val,Basic_url.status==True).all()
     def get_key_period(freq):
@@ -163,8 +171,8 @@ class Query:
     def get_url_min(user):
         return db.session.query(Value.url_id,func.min(Value.value)).filter()
     
-    def add_values(url_id,timestamp,value):
-        value_obj = Value(url_id=url_id,timestamp=timestamp,value=value)
+    def add_values(url_id,tag,value):
+        value_obj = Value(url_id=url_id,value=float(value),tag=tag)
         db.session.add(value_obj)
         db.session.commit()
   
@@ -367,7 +375,7 @@ def api_print_basics():
 @app.route('/URL/Remove', methods=['POST'])
 @token_required
 def api_remove_basic():
-    print(Query.get_token())
+    print(Query.get_tokens())
     if not request.form.get('id'):
         return 'Missing [id] Argument',400
     if not Query.check_basics_id(request.form.get('id')):        
