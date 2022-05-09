@@ -1,9 +1,16 @@
-from api_daemon import Query
+from api_methods import Query
 from utils import *
 from make_requests import *
 from datetime import datetime as dt
 
 tokens = {}
+
+def make_requests(val):
+    
+    # ver o tipo de auth do url
+    # dependendo do valor fazer o pedido, formatar e guardar na DB
+    
+    return 
 
 
 def format_influx(metric_id,data):
@@ -33,14 +40,16 @@ def request_basic(url):
     if request.status_code == 200: 
         for val in Query.get_basic_args(url):
             args = [arg.strip() for arg in val[0].split(',')] if val[0] else 1
-            print(url,args)
+            url_id = val[1]
+            print(url,args,url_id)
             try:
                 db_entrys = format_influx(val[1],merge_filter(request.json(),args))
                 if db_entrys:
                     try:
-                        influx.write_points(db_entrys, database="Metrics")
+                        for entry in db_entrys:
+                            Query.add_values(url_id,entry,datetime.datetime())
                     except:
-                        print('influx failed')
+                        print('writing values failed')
                 else:
                     Query.pause_basic(val[1])
                     print('BAD FORMAT BASIC')
@@ -80,9 +89,10 @@ def request_key(val):
                 db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
                 if db_entrys:
                     try:
-                        influx.write_points(db_entrys, database="Metrics")
+                        for entry in db_entrys:
+                            Query.add_values(val.metric_id,entry,datetime.datetime())
                     except:
-                        print('influx failed')
+                        print('writing values failed')
                 else:
                     print('BAD FORMAT')
                     Query.pause_key(val.metric_id)
@@ -121,9 +131,10 @@ def request_http(val):
             print('\n')
             if db_entrys:
                 try:
-                    influx.write_points(db_entrys, database="Metrics")
+                    for entry in db_entrys:
+                        Query.add_values(val.metric_id,entry,datetime.datetime())
                 except:
-                    print('influx failed')
+                    print('writing values failed')
             else:
                 print('BAD FORMAT')
                 Query.pause_http(val.metric_id)
@@ -195,9 +206,10 @@ def request_token(val):
             db_entrys = format_influx(val.metric_id,merge_filter(request.json(),args))
             if db_entrys:
                 try:
-                    influx.write_points(db_entrys, database="Metrics")
+                    for entry in db_entrys:
+                        Query.add_values(val.metric_id,entry,datetime.datetime())
                 except:
-                    print('influx failed')
+                    print('writing values failed')
             else:
                 print('BAD FORMAT')
                 Query.pause_token(val.metric_id)

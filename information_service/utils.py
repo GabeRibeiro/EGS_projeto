@@ -8,8 +8,6 @@ import base64
 import pytz
 from pytz import timezone, common_timezones
 from datetime import datetime
-from make_requests import influx
-
 
 
 def make_request(url):  

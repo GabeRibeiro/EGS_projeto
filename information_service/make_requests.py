@@ -2,12 +2,10 @@ import time
 import threading
 
 from datetime import datetime
-from influxdb import InfluxDBClient
 from apscheduler.schedulers.background import BackgroundScheduler
-from api_daemon import Query
+from api_methods import Query
 from make_requests_utils import *
 
-influx = InfluxDBClient(host='40.68.96.164', port=8086, username="peikpis", password="peikpis_2021")
 scheduler = BackgroundScheduler()
 
 basic_scheduelers = {'5':1,'15':1,'30':1,'60':1,'1440':1}
@@ -18,9 +16,9 @@ token_scheduelers = {'5':1,'15':1,'30':1,'60':1,'1440':1}
 def make_request(period):
     
     for val in Query.get_basic_period(period):
-        request_basic(val[0])
+        make_requests(val)
         
-    
+    """
     for val in Query.get_key_period(period): 
         request_key(val)
         
@@ -31,7 +29,8 @@ def make_request(period):
       
     for val in Query.get_token_period(period):
         request_token(val)
-     
+    """
+
 
 def start_requests_basic(period,request_id):
     threads = []
@@ -146,6 +145,7 @@ def remove_http(period,request_id):
 def remove_token(period,request_id):
     token_scheduelers[str(period)] += 1
     scheduler.remove_job(str(period)+"minjob_token"+str(request_id))
+
 
 def main():
     
