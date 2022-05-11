@@ -13,11 +13,12 @@ OpenApi description is available [here](./docs/api.yaml).
 ### Push Notifications
 Push notifications are implemented using the Socket.IO library, as such, integration with a push notification client is relatively trivial.
 
-In the folder [fe_sdk](./fe_sdk) theres is an example of usage.
+In the folder [fe_sdk](./fe_sdk) there is an example of usage.
 
 ### Not yet implemented
-- Phone Text Notification
 
+### Not going to implement:
+- Phone Text Notification: due to the need of having  a mobile number all services charge some money for its usage, unlike email.
 
 ## Execution
 At the moment this service can only be built and executed by using npm scripts.
@@ -42,7 +43,6 @@ To build and start server:
 ## Todo:
 - [ ] Integration of auth service
 - [x] Email notification
-- [ ] Phone Text notification
 - [x] Notification Persistence Pagination
 - [ ] Docker image and docker compose files
 - [ ] Improve documentation
