@@ -10,6 +10,7 @@
     "allowJs": false,
     "importHelpers": true,
     "allowSyntheticDefaultImports": true,
+    "removeComments": true,
 
     "esModuleInterop": false,
     "module": "commonjs",
