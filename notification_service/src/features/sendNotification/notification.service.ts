@@ -16,7 +16,7 @@ async function _getTransporter() {
     // const testAccount = await nodemailer.createTestAccount();
     // create reusable transporter object using the default SMTP transport
     _transporter = nodemailer.createTransport( {
-        service:"hotmail",
+        service:process.env.MAILSERVICE,
         auth: {
             user: process.env.MAILACCOUNT,
             pass: process.env.MAILPASSWD
@@ -38,6 +38,7 @@ export async function sendEmail(msgText:string, recipient:string) {
 }
 
 // todo pnone text notification
+// not going to be implemented due to the cost, theres no free service
 export async  function sendText(msgText: string, recipient:number) {
     logger.info("Text Sent to: "+recipient);
     return;
