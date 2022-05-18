@@ -4,7 +4,7 @@ cd deploy
 
 docker-compose up --build
 
-ACCESS:
+# ACCESS:
 
 localhost:3000/register
 
