@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+
+  mongodb:
+    image: mongo:5.0.2
+    container_name: mongo
+    restart: unless-stopped 
+    environment:
+      MONGO_INITDB_DATABASE: db
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 123456
+    command: mongod --auth 
+    volumes:
+      - db:/data/db
+  api:
+    depends_on:
+      - mongodb
+    container_name: authentication_api
+    restart: unless-stopped
+    image: api
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.api
+    ports:
+      - 3000:3000
+    tty: true
+
+volumes:
+    db:

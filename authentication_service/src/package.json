@@ -1,13 +1,13 @@
 {
-  "name": "authentication_proj_ex2",
+  "name": "authentication_service",
   "version": "1.0.0",
-  "description": "",
+  "description": "Authentication service",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "node index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Gabriel Ribeiro gabrielribeiro00@ua.pt",
   "license": "ISC",
   "dependencies": {
     "@hapi/joi": "^17.1.1",

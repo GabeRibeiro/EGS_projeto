@@ -7,7 +7,8 @@ const User = require('./model/User')
 const jwt = require('jsonwebtoken')
 const verify = require('./routes/verifyToken')
 const { registerValidation, loginValidation } = require('./validation')
-const url = 'mongodb://127.0.0.1:27017';
+
+const url = 'mongodb://root:123456@mongo:27017';
 
 app.set('view-engine', 'ejs')
 
@@ -15,6 +16,8 @@ app.set('view-engine', 'ejs')
 
 dotenv.config();
 
+
+mongoose.Promise = global.Promise
 //Connect to DB
 mongoose.connect(
         url , {
