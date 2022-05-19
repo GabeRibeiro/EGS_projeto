@@ -7,12 +7,12 @@ export const testConnection = async () => {
     return await pool.query("SELECT NOW()");
 }
 
-export const getDormantNotifications = async (uid:number): Promise<NotificationModel[]> => {
+export const getDormantNotifications = async (uid:string): Promise<NotificationModel[]> => {
     const result = await pool.query("Select * from notificationQueue where uid=$1", [uid]);
     return result.rows.map(row => new NotificationModel(row.uid, row.pid, row.msg)) as NotificationModel[];
 }
 
-export const deleteDormantNotifications = async (uid:number): Promise<boolean> => {
+export const deleteDormantNotifications = async (uid:string): Promise<boolean> => {
     try{
         await pool.query("delete FROM notificationQueue where uid= $1", [uid]);
         return true;
@@ -21,7 +21,7 @@ export const deleteDormantNotifications = async (uid:number): Promise<boolean> =
     }
 }
 
-export const insertDormantNotification = async (uid:number, text:string, pid?:number): Promise<boolean> => {
+export const insertDormantNotification = async (uid:string, text:string, pid?:number): Promise<boolean> => {
     try{
         if (pid) {
             await pool.query("insert into notificationQueue(uid, pid, msg) values ($1, $2, $3)", [uid, pid, text]);
@@ -38,7 +38,7 @@ export const insertDormantNotificationModel = async (n: NotificationModel): Prom
     return insertDormantNotification(n.uid, n.txt, n.pid);
 }
 
-export const getNotifications = async (uid:number, nrPage?:number, resultsPerPage?:number): Promise<NotificationModel[]> => {
+export const getNotifications = async (uid:string, nrPage?:number, resultsPerPage?:number): Promise<NotificationModel[]> => {
     let lastIdx = 0;
 
     try {
@@ -48,7 +48,7 @@ export const getNotifications = async (uid:number, nrPage?:number, resultsPerPag
     }
 
     try{
-        const params = [uid];
+        const params:(string | number)[] = [uid];
         let wherePart ="";
         let limitPart = ""
 
@@ -65,7 +65,7 @@ export const getNotifications = async (uid:number, nrPage?:number, resultsPerPag
     }
 }
 
-export const insertNotification = async (uid:number, text:string): Promise<NotificationModel> => {
+export const insertNotification = async (uid:string, text:string): Promise<NotificationModel> => {
     try{
         const res = await pool.query("insert into notification(uid, msg) values ($1, $2) RETURNING id", [uid, text]);
         return new NotificationModel(uid, res.rows[0].id, text);
