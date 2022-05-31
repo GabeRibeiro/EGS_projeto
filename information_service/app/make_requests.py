@@ -16,17 +16,17 @@ token_scheduelers = {'5':1,'15':1,'30':1,'60':1,'1440':1}
 def make_request(period):
     
     for val in Query.get_requests_period(period):
-        if val.auth_type == 'token':
-            token_url = Query.get_token(val.auth_type)
-            #request_token(val,token_url.token_url,token_url.key,token_url.secret,token_url.content_type,token_url.auth_type)
-        elif val.auth_type == 'http':
-            http_url = Query.get_http(val.auth_type)
-            #request_http(val,http_url.username,http_url.key)
-        elif val.auth_type == 'key':
-            key_url = Query.get_key(val.auth_type)
-            #request_key(val,key_url.key)
+        if val[7] == 'token':
+            token_url = Query.get_token(val[0])
+            request_token(val[0],val[1],val[3],val[4],token_url[2],token_url[3],token_url[4],token_url[5],token_url[6])
+        elif val[7] == 'http':
+            http_url = Query.get_http(val[0])
+            request_http(val[0],val[1],val[3],val[4],http_url[3],http_url[2])
+        elif val[7] == 'key':
+            key_url = Query.get_key(val[0])
+            request_key(val[0],val[1],val[3],val[4],key_url[1])
         else:
-            request_basic(val)
+            request_basic(val[0],val[1],val[3],val[4])
 
 def main():
     

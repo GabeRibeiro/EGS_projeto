@@ -61,3 +61,19 @@ print(r.text)
 if r.status_code < 400:
     print(r)
 print()
+
+print("_________________ Pause __________________")
+r = requests.post('http://127.0.0.1:5000/URL/Pause',{"user_id":1,"id":1},headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print(r.status_code)
+print(r.text)
+if r.status_code < 400:
+    print(r)
+print()
+
+print("_________________ PRINT __________________")
+r = requests.get('http://127.0.0.1:5000/URL/Print',headers={'Authorization':'ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238'})
+print(r.status_code)
+print(r.text)
+if r.status_code < 400:
+    print(r)
+print()

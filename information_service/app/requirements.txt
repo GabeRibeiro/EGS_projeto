@@ -1,9 +1,7 @@
-Flask==2.1.0
+Flask==2.1.2
 Flask-RESTful==0.3.9
-Flask-SQLAlchemy==2.5.1
-SQLAlchemy==1.4.11
-jwt==1.2.0
-APScheduler==3.7.0
+flask-mysql==1.5.2
+APScheduler
 certifi==2020.12.5
 chardet==4.0.0
 idna==2.10
@@ -14,5 +12,7 @@ requests==2.25.1
 six==1.15.0
 tzlocal==2.1
 urllib3==1.26.4
-
+mysql-connector-python==8.0.29
+#mysqlclient==2.1.0
+#PyMySQL==1.0.2
 
