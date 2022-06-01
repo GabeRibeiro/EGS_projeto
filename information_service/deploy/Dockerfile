@@ -26,10 +26,13 @@ COPY app/make_requests.py make_requests.py
 COPY app/make_requests_utils.py make_requests_utils.py
 COPY app/api_methods.py api_methods.py
 COPY app/startup.sh startup.sh
+COPY app/requests.sh requests.sh
 
-RUN chmod +x startup.sh  
+RUN chmod +x startup.sh
+RUN chmod +x requests.sh  
 
 EXPOSE 8080
 
 ENTRYPOINT ["./startup.sh"]
-#ENTRYPOINT ["python3", "api_methods.py"]
+ENTRYPOINT ["./requests.sh"]
+#ENTRYPOINT ["python3", "make_requests.py"]

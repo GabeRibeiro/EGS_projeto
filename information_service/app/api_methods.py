@@ -114,26 +114,37 @@ class Query:
         val = (freq,user_id)
         cursor.execute(sql,val)
         return cursor.fetchall()
-    """
     def get_requests_period(freq):
-        return db.session.query(Basic_url).filter(Basic_url.status==True,Basic_url.period==freq and Basic_url.user_id == user_id).all()
+        sql = 'SELECT * FROM Basic_url WHERE period = %s AND status = 1'
+        val = [freq]
+        cursor.execute(sql,val)
+        return cursor.fetchall()
+
     def get_basic_period(freq,user_id):
-        return db.session.query(Basic_url).filter(Basic_url.status==True,Basic_url.period==freq and Basic_url.user_id == user_id).all()
+        sql = 'SELECT * FROM Basic_url WHERE period = %s AND status = 1'
+        val = [freq]
+        cursor.execute(sql,val)
+        return cursor.fetchall()
+        #return db.session.query(Basic_url).filter(Basic_url.status==True,Basic_url.period==freq and Basic_url.user_id == user_id).all()
     def get_key(metric_id):
-        return db.session.query(Key_url).filter(Key_url.metric_id == metric_id).scalar()
+        sql = 'SELECT * FROM Basic_url WHERE metric_id = %s'
+        val = [metric_id]
+        cursor.execute(sql,val)
+        return cursor.fetchone()
+        #return db.session.query(Key_url).filter(Key_url.metric_id == metric_id).scalar()
     def get_http(metric_id):
-        return db.session.query(Http_url).filter(Http_url.metric_id == metric_id).scalar()
+        sql = 'SELECT * FROM Basic_url WHERE metric_id = %s'
+        val = [metric_id]
+        cursor.execute(sql,val)
+        return cursor.fetchone()
+        #return db.session.query(Http_url).filter(Http_url.metric_id == metric_id).scalar()
     def get_token(metric_id):
-        return db.session.query(Token_url).filter(Token_url.metric_id == metric_id).scalar()
-    def get_basic_args(val):
-        return db.session.query(Basic_url.tag,Basic_url.value,Basic_url.metric_id).filter(Basic_url.url==val,Basic_url.status==True).all()
-    def get_key_period(freq):
-        return Key_url.query.filter(Key_url.status==True,Key_url.period==freq).all()
-    def get_http_period(freq):
-        return Http_url.query.filter(Http_url.status==True,Http_url.period==freq).all()
-    def get_token_period(freq):
-        return Token_url.query.filter(Token_url.status==True,Token_url.period==freq).all()
-    """
+        sql = 'SELECT * FROM Basic_url WHERE metric_id = %s'
+        val = [metric_id]
+        cursor.execute(sql,val)
+        return cursor.fetchone()
+        #return db.session.query(Token_url).filter(Token_url.metric_id == metric_id).scalar()
+    
     def remove_basic(metric_id,user_id):
         sql = 'DELETE FROM Basic_url WHERE metric_id = %s AND user_id = %s'
         val = (metric_id,user_id)

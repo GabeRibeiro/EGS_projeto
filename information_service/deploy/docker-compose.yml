@@ -1,4 +1,5 @@
 # sudo docker-compose -f deploy/docker-compose.yml  up --build
+# sudo docker-compose -f deploy/docker-compose.yml  up
 
 version: "3"
 services:
@@ -20,3 +21,11 @@ services:
         volumes:
             - ../app/db/entry:/docker-entrypoint-initdb.d/:ro
             - ../app/db/data:/var/lib/mysql
+    # app:
+    #     container_name: requests
+    #     links:
+    #         -db
+    #     image: api
+    #     build:
+    #         context: ..
+    #         dockerfile: deployRequest/Dockerfile
