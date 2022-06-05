@@ -1,7 +1,7 @@
 services:
 
   notification_service_db:
-    image: "postgres:latest"
+    image: "postgres:14.3-alpine"
     environment:
       - POSTGRES_PASSWORD=password
     volumes:
