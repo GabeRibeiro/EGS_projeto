@@ -1,8 +1,9 @@
-# sudo docker-compose -f deploy/docker-compose.yml  up --build
+# sudo docker-compose -f deploy/docker-compose.yml  -p 8000:8000 up --build
 # sudo docker-compose -f deploy/docker-compose.yml  up
-
+# sudo docker run -dti --name api -p 8080:8080 webapp
 version: "3"
 services:
+
     api:
         container_name: api
         links:
@@ -10,9 +11,9 @@ services:
         image: api
         build:
           context: ..
-          dockerfile: deploy/Dockerfile
+          dockerfile: deploy/Dockerfile.api
         ports:
-            - "8080:8080"
+            - "8000:8000"
     db:
         container_name: db
         image: mysql:8.0.21
@@ -21,11 +22,13 @@ services:
         volumes:
             - ../app/db/entry:/docker-entrypoint-initdb.d/:ro
             - ../app/db/data:/var/lib/mysql
-    # app:
-    #     container_name: requests
-    #     links:
-    #         -db
-    #     image: api
-    #     build:
-    #         context: ..
-    #         dockerfile: deployRequest/Dockerfile
+    requester:
+        container_name: requester
+        links:
+            - db
+        image: requester
+        build:
+          context: ..
+          dockerfile: deploy/Dockerfile.req
+        #ports:
+        #    - "8080:8080"

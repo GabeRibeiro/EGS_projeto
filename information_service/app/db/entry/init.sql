@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS Basic_url(
     );
 
 
-CREATE TABLE Key_url( 
+CREATE TABLE IF NOT EXISTS Key_url( 
         metric_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
         secret_key VARCHAR(255) NOT NULL,
         parent_id INT NOT NULL,
@@ -28,7 +28,17 @@ CREATE TABLE Key_url(
         FOREIGN KEY (parent_id) REFERENCES Basic_url(metric_id) ON DELETE CASCADE
     );
 
-CREATE TABLE Token_url( 
+CREATE TABLE IF NOT EXISTS Http_url( 
+        metric_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+        parent_id INT NOT NULL,
+        secret_key VARCHAR(300) NOT NULL,
+        username VARCHAR(300) NOT NULL,
+        
+        FOREIGN KEY (parent_id) REFERENCES Basic_url(metric_id) ON DELETE CASCADE
+    );
+
+
+CREATE TABLE IF NOT EXISTS Token_url( 
         metric_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
         parent_id INT NOT NULL,
         token_url VARCHAR(500) NOT NULL,
@@ -40,10 +50,13 @@ CREATE TABLE Token_url(
         FOREIGN KEY (parent_id) REFERENCES Basic_url(metric_id) ON DELETE CASCADE
     );
 
-CREATE TABLE Value( 
+
+CREATE TABLE IF NOT EXISTS Value( 
         url_id INT NOT NULL,
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        tag VARCHAR(100) PRIMARY KEY,
+        tag VARCHAR(100),
         value FLOAT,
+        PRIMARY KEY(tag,timestamp,url_id),
+        
         FOREIGN KEY (url_id) REFERENCES Basic_url(metric_id) ON DELETE CASCADE
     );

@@ -65,6 +65,7 @@ def epoch2utc(timestamp):
 
 def filter_entrys(data,tag,value):
     entrys = []
+    
     for field in data:
         if isinstance(field,str):
             if isinstance(data[field],dict):

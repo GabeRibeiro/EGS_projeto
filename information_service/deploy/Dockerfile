@@ -31,8 +31,9 @@ COPY app/requests.sh requests.sh
 RUN chmod +x startup.sh
 RUN chmod +x requests.sh  
 
-EXPOSE 8080
+EXPOSE 8000
 
+#RUN export FLASK_APP=api_methods.py
 ENTRYPOINT ["./startup.sh"]
 ENTRYPOINT ["./requests.sh"]
 #ENTRYPOINT ["python3", "make_requests.py"]

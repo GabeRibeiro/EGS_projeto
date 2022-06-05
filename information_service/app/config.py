@@ -14,5 +14,7 @@ class Config:
 	apphost = config.get('apphost')
 	database = config.get('database')
 	URI = config.get('URI')
+	ip = config.get('ip')
+	dbport = config.get('dbport')
 	port = config.get('port')
 	key = config.get('key')
