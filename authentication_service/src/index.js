@@ -34,7 +34,7 @@ mongoose.connect(
 //Middleware
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
-
+app.use(express.static(__dirname + '/views'))
 
 app.get('/register', (req, res) => {
     res.render('register.ejs')
@@ -95,7 +95,7 @@ app.post('/login', async (req, res) => {
 
 
 
-app.post('/verifyToken', verify,  async (req,res) => {
+app.get('/verifyToken', verify,  async (req,res) => {
 
     res.json({
         message: 'Sucessfully logged in',
