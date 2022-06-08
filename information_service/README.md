@@ -21,3 +21,15 @@ pip install -r requirements.txt
 ```bash
 pip-review --auto
 ```
+
+5. Build & Run Docker:
+
+```bash
+sudo docker-compose -f deploy/docker-compose.yml  up --buil
+```
+
+6. Run Docker:
+
+```bash
+sudo docker-compose -f deploy/docker-compose.yml  up
+```

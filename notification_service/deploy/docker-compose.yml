@@ -1,0 +1,43 @@
+services:
+
+  notification_service_db:
+    image: "postgres:14.3-alpine"
+    environment:
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_db_data:/var/lib/postgresql/data
+    # todo: db redundancy
+
+  notification_service_api:
+    build:
+      context: ../
+      dockerfile: deploy/prod.dockerfile
+
+    depends_on:
+      - notification_service_db
+
+    environment:
+      - SERVER_PORT=10000
+      # DB access credentials
+      - PGHOST=notification_service_db
+      - PGDATABASE=postgres
+      - PGUSER=postgres
+      # same password that was defined in db's env
+      - PGPASSWORD=password
+      # Auth Service's endpoint to verify auth tokens (full URL)
+      # todo: define at project level
+      - AUTHSERVICE_VERIFY_URL="authservice/verifyToken"
+      # Which mail service will be used (ex: 'hotmail')
+      - MAILSERVICE=hotmail
+      # email account
+      # todo: secret
+      - MAILACCOUNT=""
+      # email account password
+      # todo: secret
+      - MAILPASSWD=""
+    ports:
+      - 10000:10000
+
+volumes:
+  postgres_db_data:

@@ -1,0 +1,13 @@
+{
+    "user": "root",
+    "password": "root",
+    "host": "db",
+    "dbport": "3306",
+    "port": "8000",
+    "ip": "0.0.0.0",
+    "database": "url_db",
+    "URI": "mysql://root:''@localhost/url_db",
+    "key": "ASDzxcdwekjkads786zxc123asdzxc98788ASd9231sz76238",
+    "apphost": "0.0.0.0"
+}
+

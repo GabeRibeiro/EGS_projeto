@@ -3,10 +3,16 @@ import * as logger from "@/logger";
 import * as db from '@/db';
 import {NotificationModel} from "@/db/models/Notification.model";
 
-const ioSocketMap = new Map<number, SocketWithUser>();
+const ioSocketMap = new Map<string, SocketWithUser>();
 
 export const socketHandler = async (socket:SocketWithUser) => {
+
     const uid = socket.user.uid;
+
+    if(!uid) {
+        return
+    }
+
     logger.log('User connected: '+uid);
     socket.on('disconnect',  () => {
         ioSocketMap.delete(uid);
@@ -23,16 +29,18 @@ export const socketHandler = async (socket:SocketWithUser) => {
     await db.deleteDormantNotifications(uid);
 }
 
-export const getUserSocket = (uid: number) => {
+export const getUserSocket = (uid: string) => {
     return ioSocketMap.get(uid);
 }
 
-export const isUserConnected = (uid: number) => {
+export const isUserConnected = (uid: string) => {
     return ioSocketMap.get(uid) !== undefined;
 }
 
-export const notifyUser = async (uid:number, n:NotificationModel) => {
-    const socket = ioSocketMap.get(Number(uid));
+export const notifyUser = async (uid:string, n:NotificationModel) => {
+    const socket = ioSocketMap.get(uid);
+
+
 
     if (socket) {
         socket.emit(SocketEvents.NewNotification, n);

@@ -1,17 +1,47 @@
 import {RequestHandler} from 'express';
+import axios from 'axios';
+import * as jwt from 'jsonwebtoken';
 import {RequestWithUser, SocketWithUser} from "@/interfaces/auth.interface";
 import HttpException from "@/exceptions/HTTPException.exception";
 import {User} from "@/interfaces/user.interface";
 
-/** todo
+/**
  * validates an auth token and returns a User (user.interface).
  * @param token token to be validated.
+ * (as per auth service definition, token has a jwt format but still needs to be verified with remote service)
  */
-const validateAuthToken = token => {
+const validateAuthToken = async (token:string)  => {
     if(!token) {
         return null;
     }
-    return {uid: Number(token)} as User;
+
+    // check validity of the token with auth service
+    let response = null;
+    try {
+        response = await axios({
+            url:process.env.AUTHSERVICE_VERIFY_URL,
+            method: "POST",
+            headers: {
+                [process.env.AUTHSERVICE_VERIFY_HEADER]: token.replace(/(\r\n|\n|\r)/gm, "")
+            }
+        })
+    }
+    catch (err) {
+        return null
+    }
+
+    // As of api definition, token can only be considered valid if response code == 200
+    if(!response || response.status !== 200){
+        // token isn't valid, therefore there is nothing to be returned
+        return null;
+    }
+
+    // get token data (jwt format)
+    const tokenData = await jwt.decode(token);
+
+    console.log("@validateAuthToken token ok")
+
+    return {uid: tokenData._id} as User;
 }
 
 /**
@@ -21,7 +51,7 @@ const validateAuthToken = token => {
  * @param res
  * @param next
  */
-export const authMiddleware: RequestHandler =  (req:RequestWithUser, res, next) => {
+export const authMiddleware: RequestHandler =  async (req:RequestWithUser, res, next) => {
     const authHeader = req.header('Authorization');
 
     if(!authHeader){
@@ -29,8 +59,8 @@ export const authMiddleware: RequestHandler =  (req:RequestWithUser, res, next) 
     }
 
     // extract user data
-    // check user auththorization w auth service
-    const user= validateAuthToken(authHeader);
+    // check user authorization w auth service
+    const user = await validateAuthToken(authHeader);
 
     if(!authHeader) {
         next(new HttpException(401, "Not Authorized!"));
@@ -41,22 +71,22 @@ export const authMiddleware: RequestHandler =  (req:RequestWithUser, res, next) 
 }
 
 /**
- * Midlleware to authenticate SocketIO calls.
+ * Middleware to authenticate SocketIO calls.
  * If token isn't valid, calls next with a HttpException().
  * @param socket Current socket connection.
  * @param next
  */
-export const authMidllewareSIO = (socket:SocketWithUser,  next) => {
+export const authMidllewareSIO = async (socket:SocketWithUser,  next) => {
     const token = socket.handshake.auth.token;
     if (!token) {
         next(new HttpException(401, "Not Authorized!"));
     }
 
     // verify token
-    const user = validateAuthToken(token);
+    const user = await validateAuthToken(token);
 
     if(!user) {
-        next(new HttpException(401, "Not Authorized!"));
+        return next(new HttpException(401, "Not Authorized!"));
     }
 
     socket.user = user;

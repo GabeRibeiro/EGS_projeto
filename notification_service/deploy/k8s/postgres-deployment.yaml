@@ -1,0 +1,68 @@
+# Postgres db deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service-db
+  namespace: jfs4
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-service-db
+  template:
+    metadata:
+      labels:
+        app: notification-service-db
+    spec:
+      containers:
+        - name: notification-service-db
+          image: postgres:14.3-alpine
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+              name: db-port
+          envFrom:
+            - configMapRef:
+                name: notification-service-config-db
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: notification-service-secrets
+                  key: PGPASSWORD
+                  optional: false
+
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-data
+              subPath: postgres
+            - mountPath: /docker-entrypoint-initdb.d/init.sql
+              name: init-sql
+              subPath: init.sql
+              readOnly: true
+
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: notification-service-app-jfs-pvc
+        - name: init-sql
+          configMap:
+            name: notification-service-config-db
+            items:
+              - key: init.sql
+                path: init.sql
+
+# Postgres db deployment service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service-db-service
+  namespace: jfs4
+spec:
+  ports:
+    - port: 5432
+      targetPort: db-port
+  selector:
+    app: notification-service-db
