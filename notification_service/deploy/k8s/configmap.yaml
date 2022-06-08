@@ -1,0 +1,47 @@
+# Main service app config
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notification-service-config
+  namespace: jfs4
+data:
+  SERVER_PORT: "10000"
+  # DB access credentials
+  PGHOST: "notification-service-db-service"
+  PGDATABASE: "postgres"
+  PGUSER: "postgres"
+  #PGPASSWORD in secret
+  # Auth Service's endpoint to verify auth tokens (full URL)
+  # todo: define at project level
+  AUTHSERVICE_VERIFY_URL: "authservice/verifyToken"
+  # Which mail service will be used (ex: 'hotmail')
+  MAILSERVICE: "hotmail"
+  # Mail Credential in Secret
+
+---
+# Postgres DB 'exclusive' config
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notification-service-config-db
+  namespace: jfs4
+data:
+  # DB access credentials
+  POSTGRES_USER: "postgres"
+  POSTGRES_DB: "postgres"
+
+  init.sql: |
+    create table notification(
+        uid text not null,
+        id serial,
+        msg text not null,
+        primary key (uid, id)
+    );
+
+    create table notificationQueue(
+        uid text not null,
+        id serial,
+        pid int default -1,
+        msg text not null,
+        primary key (uid, id)
+    );
