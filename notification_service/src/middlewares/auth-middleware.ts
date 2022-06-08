@@ -4,6 +4,7 @@ import * as jwt from 'jsonwebtoken';
 import {RequestWithUser, SocketWithUser} from "@/interfaces/auth.interface";
 import HttpException from "@/exceptions/HTTPException.exception";
 import {User} from "@/interfaces/user.interface";
+import {logger} from "@/logger";
 
 /**
  * validates an auth token and returns a User (user.interface).
@@ -13,6 +14,11 @@ import {User} from "@/interfaces/user.interface";
 const validateAuthToken = async (token:string)  => {
     if(!token) {
         return null;
+    }
+
+    if(process.env.DEBUG.valueOf() === "true".valueOf()) {
+        logger.info("@validateAuthToken DEBUG MODE")
+        return {uid: token} as User;
     }
 
     // check validity of the token with auth service

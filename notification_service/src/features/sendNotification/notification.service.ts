@@ -26,15 +26,20 @@ async function _getTransporter() {
 }
 
 export async function sendEmail(msgText:string, recipient:string) {
-    const transporter = await _getTransporter();
+    try {
+        const transporter = await _getTransporter();
 
-    const info = await transporter.sendMail({
-        from: process.env.MAILACCOUNT,
-        to: recipient,
-        subject: _emailSubject,
-        text: msgText
-    });
-    logger.info("Email Sent to: "+recipient);
+        const info = await transporter.sendMail({
+            from: process.env.MAILACCOUNT,
+            to: recipient,
+            subject: _emailSubject,
+            text: msgText
+        });
+        logger.info("Email Sent to: "+recipient);
+    } catch (e) {
+        logger.error("Email not sent: "+recipient);
+        logger.error(e.message);
+    }
 }
 
 // todo pnone text notification
