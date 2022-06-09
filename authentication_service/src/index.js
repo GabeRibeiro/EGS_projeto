@@ -47,11 +47,13 @@ app.get('/login', (req, res) => {
 app.post('/register', async (req, res) => {
     //Validate
     const { error } = registerValidation(req.body)
-    if(error) return res.status(400).send(error.details[0].message) 
-
+    if(error){
+        let aux = "ERROR: " + error.toString().substring(17)
+        return res.status(400).render('fail.ejs', {err: aux})
+    } 
     //Check if user already exists
     const emailExists = await User.findOne({email: req.body.email})
-    if(emailExists) return res.status(400).send('Email already exists')
+    if(emailExists) return res.status(400).render('fail.ejs', {err: "Email already exists"})
 
 
     //Hash passwords
@@ -77,15 +79,18 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
     //Validate
     const { error } = loginValidation(req.body)
-    if(error) return res.status(400).send(error.details[0].message) 
+    if(error){
+        let aux = "ERROR: " + error.toString().substring(17)
+        return res.status(400).render('fail.ejs', {err: aux})
+    } 
 
     //Check if user exists
     const user = await User.findOne({email: req.body.email})
-    if(!user) return res.status(400).send('Email wrong')
+    if(!user) return res.status(400).render('fail.ejs', {err: "Email is wrong"})
 
     //Check if password is correct
     const validPW = await bcrypt.compare(req.body.password, user.password)
-    if(!validPW) return res.status(400).send('Password wrong')
+    if(!validPW) return res.status(400).render('fail.ejs', {err: "Password incorrect"})
     
     //Create and assign a token
     const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET, {expiresIn: '6h'})
