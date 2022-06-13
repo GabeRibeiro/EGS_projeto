@@ -617,4 +617,5 @@ def home():
 
 if __name__ == "__main__":
     app.run(host=Config.ip,port=Config.port,debug=True)
+    cursor.close()
     db.close()
