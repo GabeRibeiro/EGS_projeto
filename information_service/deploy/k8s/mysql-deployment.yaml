@@ -1,0 +1,66 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: information-service-db
+  namespace: zedleague
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: information-service-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: information-service-db
+    spec:
+      containers:
+        - name: information-service-db
+          image: mysql:8.0.21
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 3306
+              name: db-port
+          envFrom:
+            - configMapRef:
+                name: information-service-config-db
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: information-service-mysql-secret
+                  key: password
+                  optional: false
+
+          volumeMounts:
+            #- mountPath: /var/lib/mysql/data
+            #  name: mysql-data
+            #  subPath: mysql
+            - mountPath: /docker-entrypoint-initdb.d/init.sql
+              name: init-sql
+              subPath: init.sql
+
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: information-service-mysql-claim
+        - name: init-sql
+          configMap:
+            name: information-service-config-db
+            items:
+              - key: init.sql
+                path: init.sql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: information-service-db-service
+  namespace: zedleague
+spec:
+  ports:
+  - port: 3306
+    targetPort: db-port
+  selector:
+    app: information-service-db

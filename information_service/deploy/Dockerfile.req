@@ -1,0 +1,24 @@
+FROM python:3.8-alpine
+
+MAINTAINER Alexandre Oliveira
+
+LABEL version="1.0"
+
+# Create app directory
+RUN mkdir /req
+WORKDIR /req
+
+COPY app/requirements_req.txt requirements_req.txt
+
+RUN python3 -m pip install --upgrade pip
+RUN pip install -r requirements_req.txt
+
+COPY app/utils.py utils.py
+COPY app/config.py config.py
+COPY app/config.json config.json
+COPY app/make_requests.py make_requests.py
+COPY app/make_requests_utils.py make_requests_utils.py
+COPY app/requests.sh requests.sh
+
+RUN chmod +x requests.sh  
+ENTRYPOINT ["./requests.sh"]
