@@ -15,8 +15,8 @@ data:
   # todo: define at project level
   AUTHSERVICE_VERIFY_URL: "authservice/verifyToken"
   # Which mail service will be used (ex: 'hotmail')
-  MAILSERVICE: "hotmail"
-  # Mail Credential in Secret
+  MAILSERVICE: "gmail"
+  MAILACCOUNT: "noreply.jfs4@gmail.com"
 
 ---
 # Postgres DB 'exclusive' config

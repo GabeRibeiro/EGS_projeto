@@ -1,0 +1,72 @@
+---
+# Service's Main app deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service-app
+  namespace: jfs4
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-service-app
+  template:
+    metadata:
+      labels:
+        app: notification-service-app
+    spec:
+      containers:
+        - name: notification-service-app
+          # todo change to prod one
+          image: registry.deti:5000/jfs4/notification-service:beta
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "10m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+
+          ports:
+            - containerPort: 10000
+              name: app-cont-port
+
+          envFrom:
+            - configMapRef:
+                name: notification-service-config
+          env:
+            - name: DEBUG
+              value: "true"
+
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: notification-service-secrets
+                  key: PGPASSWORD
+                  optional: false
+#            - name: MAILACCOUNT
+#              valueFrom:
+#                secretKeyRef:
+#                  name: notification-service-secrets
+#                  key: MAILACCOUNT
+#                  optional: false
+            - name: MAILPASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: notification-service-secrets
+                  key: MAILPASSWD
+                  optional: false
+
+---
+# Service's Main app k8s service
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service-main
+  namespace: jfs4
+spec:
+  ports:
+    - port: 80
+      targetPort: app-cont-port
+  selector:
+    app: notification-service-app
