@@ -1,4 +1,5 @@
 # sudo docker-compose -f deploy/docker-compose.yml  up --build
+# sudo docker build --tag information-service --file deploy/Dockerfile.api .
 
 FROM python:3.8-alpine
 

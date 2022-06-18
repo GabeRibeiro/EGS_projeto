@@ -1,38 +1,43 @@
 import time
-import threading
 
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 import mysql.connector
 
 from make_requests_utils import *
-from config import *
 
 
 scheduler = BackgroundScheduler()
 
-basic_scheduelers = {'5':1,'15':1,'30':1,'60':1,'1440':1}
-key_scheduelers = {'5':1,'15':1,'30':1,'60':1,'1440':1}
-http_scheduelers = {'5':1,'15':1,'30':1,'60':1,'1440':1}
-token_scheduelers = {'5':1,'15':1,'30':1,'60':1,'1440':1}
+host = ""
+user = ""
+password = ""
+dbport = ""
+database = ""
 
-""" db = mysql.connector.connect(
-            host=Config.host,
-            user=Config.user,
-            password = Config.password,
-            port = Config.dbport,
-            database = Config.database
-        ) """
+with open("/tmp/secrets/password", 'r') as f:
+    password = f.read()
 
+with open("/tmp/secrets/host", 'r') as f:
+    host = f.read()
+
+with open("/tmp/secrets/user", 'r') as f:
+    user = f.read()
+
+with open("/tmp/secrets/dbport", 'r') as f:
+    dbport = f.read()
+
+with open("/tmp/secrets/database", 'r') as f:
+    database = f.read()
 
 class Query:
     def get_url_request(freq):
         db = mysql.connector.connect(
-                host=Config.host,
-                user=Config.user,
-                password = Config.password,
-                port = Config.dbport,
-                database = Config.database
+                host=host,
+                user=user,
+                password = password,
+                port = dbport,
+                database = database
             )
         cursor = db.cursor()
         sql = 'SELECT * FROM Basic_url WHERE period = %s'
@@ -44,11 +49,11 @@ class Query:
         return values
     def get_basic_period(freq,user_id):
         db = mysql.connector.connect(
-                host=Config.host,
-                user=Config.user,
-                password = Config.password,
-                port = Config.dbport,
-                database = Config.database
+                host=host,
+                user=user,
+                password = password,
+                port = dbport,
+                database = database
             )
         cursor = db.cursor()
         sql = 'SELECT * FROM Basic_url WHERE period = %s and user_id = %s'
@@ -60,11 +65,11 @@ class Query:
         return values
     def get_requests_period(freq):
         db = mysql.connector.connect(
-                host=Config.host,
-                user=Config.user,
-                password = Config.password,
-                port = Config.dbport,
-                database = Config.database
+                host=host,
+                user=user,
+                password = password,
+                port = dbport,
+                database = database
             )
         cursor = db.cursor()
         sql = 'SELECT * FROM Basic_url WHERE period = %s AND status = 1'
@@ -76,11 +81,11 @@ class Query:
         return values
     def get_basic_args(metric_id):
         db = mysql.connector.connect(
-                host=Config.host,
-                user=Config.user,
-                password = Config.password,
-                port = Config.dbport,
-                database = Config.database
+                host=host,
+                user=user,
+                password = password,
+                port = dbport,
+                database = database
             )
         cursor = db.cursor()
         sql = 'SELECT args FROM Basic_url WHERE metric_id = %s'
@@ -92,11 +97,11 @@ class Query:
         return values
     def get_basic_period(freq,user_id):
         db = mysql.connector.connect(
-                host=Config.host,
-                user=Config.user,
-                password = Config.password,
-                port = Config.dbport,
-                database = Config.database
+                host=host,
+                user=user,
+                password = password,
+                port = dbport,
+                database = database
             )
         cursor = db.cursor()
         sql = 'SELECT * FROM Basic_url WHERE period = %s AND status = 1'
@@ -108,11 +113,11 @@ class Query:
         return values
     def get_key(metric_id):
         db = mysql.connector.connect(
-                host=Config.host,
-                user=Config.user,
-                password = Config.password,
-                port = Config.dbport,
-                database = Config.database
+                host=host,
+                user=user,
+                password = password,
+                port = dbport,
+                database = database
             )
         cursor = db.cursor()
         sql = 'SELECT * FROM Basic_url WHERE metric_id = %s'
@@ -123,11 +128,11 @@ class Query:
         return (cursor.fetchall())[0]
     def get_http(metric_id):
         db = mysql.connector.connect(
-                host=Config.host,
-                user=Config.user,
-                password = Config.password,
-                port = Config.dbport,
-                database = Config.database
+                host=host,
+                user=user,
+                password = password,
+                port = dbport,
+                database = database
             )
         cursor = db.cursor()
         sql = 'SELECT * FROM Basic_url WHERE metric_id = %s'
@@ -138,11 +143,11 @@ class Query:
         return (cursor.fetchall())[0]
     def get_token(metric_id):
         db = mysql.connector.connect(
-                host=Config.host,
-                user=Config.user,
-                password = Config.password,
-                port = Config.dbport,
-                database = Config.database
+                host=host,
+                user=user,
+                password = password,
+                port = dbport,
+                database = database
             )
         cursor = db.cursor()
         sql = 'SELECT * FROM Basic_url WHERE metric_id = %s'
@@ -153,28 +158,28 @@ class Query:
         return (cursor.fetchall())[0]
     def pause_url(metric_id):
         db = mysql.connector.connect(
-                host=Config.host,
-                user=Config.user,
-                password = Config.password,
-                port = Config.dbport,
-                database = Config.database
+                host=host,
+                user=user,
+                password = password,
+                port = dbport,
+                database = database
             )
         cursor = db.cursor()
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'UPDATE Basic_url SET status=0 WHERE metric_id = %s'
         val = [metric_id]
         cursor.execute(sql,val)
         db.commit()
     def add_value(url_id,tag,value):
         db = mysql.connector.connect(
-                host=Config.host,
-                user=Config.user,
-                password = Config.password,
-                port = Config.dbport,
-                database = Config.database
+                host=host,
+                user=user,
+                password = password,
+                port = dbport,
+                database = database
             )
         cursor = db.cursor()
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'INSERT INTO Value (url_id,tag,value) VALUES (%s,%s,%s)'
         val = (url_id,tag,value)
         cursor.execute(sql,val)
@@ -184,14 +189,15 @@ def make_request(period):
     for val in Query.get_requests_period(period):
         if val[7] == 'token':
             token_url = Query.get_token(val[0])
-            #request_token(val[0],val[1],val[3],val[4],token_url[2],token_url[3],token_url[4],token_url[5],token_url[6],val[5])
+            request_token(val[0],val[1],val[3],val[4],token_url[2],token_url[3],token_url[4],token_url[5],token_url[6],val[5])
         elif val[7] == 'http':
             http_url = Query.get_http(val[0])
-            #request_http(val[0],val[1],val[3],val[4],http_url[3],http_url[2])
+            request_http(val[0],val[1],val[3],val[4],http_url[3],http_url[2])
         elif val[7] == 'key':
             key_url = Query.get_key(val[0])
-            #request_key(val[0],val[1],val[3],val[4],key_url[1])
+            request_key(val[0],val[1],val[3],val[4],key_url[1])
         else:
+            print(val)
             request_basic(val[0],val[1],val[3],val[4])
 
 def main():
@@ -215,8 +221,5 @@ def main():
     except (KeyboardInterrupt, SystemExit):
         print("\nexiting...\n")  
         scheduler.shutdown()
-    # db.close()
-    # cursor.close()
-    db.close()
 if __name__=="__main__":
     main()

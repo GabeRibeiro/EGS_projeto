@@ -1,0 +1,70 @@
+
+# Create App deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: information-service
+  namespace: zedleague
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: information-service
+  template:
+    metadata:
+      labels:
+        app: information-service
+    spec:
+      containers:
+      - name: information-service
+        image: registry.deti:5000/information-service:v3
+        ports:
+          - containerPort: 8000
+        volumeMounts:
+          - name: information-service-secret
+            mountPath: "/tmp/secrets"
+            readOnly: true
+      volumes:
+        - name: information-service-secret
+          secret:
+            secretName: information-service-secret
+
+# Create Service for APP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: information-service
+  namespace: zedleague
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+  selector:
+    app: information-service
+
+# Configure Traefik
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: information-service-k3s
+#   namespace: zedleague
+#   annotations:
+#     kubernetes.io/ingress.class: traefik
+#     traefik.ingress.kubernetes.io/frontend-entry-points: http,https
+#     traefik.ingress.kubernetes.io/redirect-entry-point: https
+#     traefik.ingress.kubernetes.io/redirect-permanent: "true"
+# spec:
+#   rules:
+#   - host: information-service.k3s
+#     http:
+#       paths:
+#       - path: /
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: nginx
+#             port: 
+#               number: 80

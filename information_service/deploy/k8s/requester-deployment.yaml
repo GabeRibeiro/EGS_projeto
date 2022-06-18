@@ -1,0 +1,45 @@
+
+# Create App deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: requester-service
+  namespace: zedleague
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: requester-service
+  template:
+    metadata:
+      labels:
+        app: requester-service
+    spec:
+      containers:
+      - name: requester-service
+        image: registry.deti:5000/requester-service:v3
+        ports:
+          - containerPort: 8000
+        volumeMounts:
+          - name: requester-service-secret
+            mountPath: "/tmp/secrets"
+            readOnly: true
+      volumes:
+        - name: requester-service-secret
+          secret:
+            secretName: requester-service-secret
+
+# Create Service for APP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: requester-service
+  namespace: zedleague
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+  selector:
+    app: requester-service

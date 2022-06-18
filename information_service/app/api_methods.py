@@ -2,76 +2,85 @@ from flask import Flask, request, jsonify
 import mysql.connector
 from flaskext.mysql import MySQL
 from flask_restful import Api,Resource,reqparse,abort
-from config import *
 import json
 from datetime import datetime
 from functools import wraps
 
-
 app = Flask(__name__)
-#app.config['SQLALCHEMY_DATABASE_URI'] = Config.URI
-app.config['SECRET_KEY'] = Config.key
-#app.config['MYSQL_HOST'] = Config.host
-#app.config['MYSQL_USER'] = Config.user
-#app.config['MYSQL_PASSWORD'] = 'root'
-#app.config['MYSQL_DB'] = 'flask'
 
-api = Api(app)
+host = ""
+user = ""
+password = ""
+dbport = ""
+database = ""
+
+with open("/tmp/secrets/API_KEY", 'r') as f:
+    app.config['SECRET_KEY'] = f.read()
+
+with open("/tmp/secrets/password", 'r') as f:
+    password = f.read()
+app.config["MYSQL_DATABASE_PASSWORD"] = password
+
+with open("/tmp/secrets/host", 'r') as f:
+    host = f.read()
+
+with open("/tmp/secrets/user", 'r') as f:
+    user = f.read()
+
+with open("/tmp/secrets/dbport", 'r') as f:
+    dbport = f.read()
+
+with open("/tmp/secrets/database", 'r') as f:
+    database = f.read()
+
+#print("secrets -> ",app.config['SECRET_KEY'],password,host,user,dbport,database)
 
 db = mysql.connector.connect(
-            host=Config.host,
-            user=Config.user,
-            password = Config.password,
-            port = Config.dbport,
-            database = Config.database
+            host=host,
+            user=user,
+            password = password,
+            port = dbport,
+            database = database
         )
 cursor = db.cursor()
-#Set mysql access credentials
-#db = mysql.connector.connect(
-#    host=Config.host,
-#    user=Config.user,
-#    password = Config.password,
-#    port = Config.dbport,
-#    database = Config.database
-#)
-#
-#cursor.execute("USE "+Config.database)
+
+api = Api(app)
 
 # __________________________ DB QUERYS _____________________________
 class Query:
     def last_insertedID():
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         cursor.execute('SELECT LAST_INSERT_ID()')
         values = (cursor.fetchall())[0]
         return values
 
     def add_basic(url,user_id,value,tag,period,status,auth_type):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'INSERT INTO Basic_url (url,user_id,value,tag,period,status,auth_type) VALUES (%s,%s,%s,%s,%s,%s,%s)'
         val = (url,user_id,value,tag,period,status,auth_type)
         cursor.execute(sql,val)
         db.commit()       
     def add_key(parent_id,key):
         
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'INSERT INTO Key_url (parent_id,secret_key) VALUES (%s,%s)'
         val = (parent_id,key)
         cursor.execute(sql,val)
         db.commit()
     def add_http(parent_id,key,username):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'INSERT INTO Http_url (parent_id,secret_key,username) VALUES (%s,%s,%s)'
         val = (parent_id,key,username)
         cursor.execute(sql,val)
         db.commit()
     def add_token(parent_id,token_url,key,secret,content_type,auth_type):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'INSERT INTO Token_url (parent_id,token_url,secret_key,secret,content_type,auth_type) VALUES (%s,%s,%s,%s,%s,%s)'
         val = (parent_id,token_url,key,secret,content_type,auth_type)
         cursor.execute(sql,val)
         db.commit()
     def add_value(url_id,tag,value):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'INSERT INTO Value (url_id,tag,value) VALUES (%s,%s,%s)'
         val = (url_id,tag,value)
         cursor.execute(sql,val)
@@ -79,80 +88,80 @@ class Query:
 
 
     def get_urls():
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         cursor.execute("SELECT * FROM Basic_url")
         values = cursor.fetchall()
         return values
     def get_url(user_id):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'SELECT * FROM Basic_url WHERE user_id = %s'
         val = [user_id]
         cursor.execute(sql,val)
         values = cursor.fetchall()
         return values
     def get_url_info(user_id):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'SELECT * FROM Basic_url,Key_url,Http_url,Token_url WHERE Basic_url.user_id = %d and (Basic_url.metric_id = Token.parent_id OR Basic_url.metric_id = Http_url.parent_id OR Basic_url.metric_id = Key_url.parent_id)'
         val = [user_id]
         cursor.execute(sql,val)
         values = cursor.fetchall()
         return values
     def get_url_request(freq):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'SELECT * FROM Basic_url WHERE period = %s'
         val = [freq]
         cursor.execute(sql,val)
         values = cursor.fetchall()
         return values
     def get_basic_period(freq,user_id):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'SELECT * FROM Basic_url WHERE period = %s and user_id = %s'
         val = (freq,user_id)
         cursor.execute(sql,val)
         values = cursor.fetchall()
         return values
     def get_requests_period(freq):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'SELECT * FROM Basic_url WHERE period = %s AND status = 1'
         val = [freq]
         cursor.execute(sql,val)
         values = cursor.fetchall()
         return values
     def get_basic_args(metric_id):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'SELECT args FROM Basic_url WHERE metric_id = %s'
         val = [metric_id]
         cursor.execute(sql,val)
         values = cursor.fetchall()
         return values
     def get_basic_period(freq,user_id):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'SELECT * FROM Basic_url WHERE period = %s AND status = 1'
         val = [freq]
         cursor.execute(sql,val)
         values = cursor.fetchall()
         return values
     def get_key(metric_id):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'SELECT * FROM Basic_url WHERE metric_id = %s'
         val = [metric_id]
         cursor.execute(sql,val)
         return (cursor.fetchall())[0]
     def get_http(metric_id):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'SELECT * FROM Basic_url WHERE metric_id = %s'
         val = [metric_id]
         cursor.execute(sql,val)
         return (cursor.fetchall())[0]
     def get_token(metric_id):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'SELECT * FROM Basic_url WHERE metric_id = %s'
         val = [metric_id]
         cursor.execute(sql,val)
         return (cursor.fetchall())[0]
     # verificar se o user tem acesso aos urls
     def get_url_data(user,id,tag,lower_limit, upper_limit):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'SELECT * FROM Value,Basic_url WHERE Basic_url.metric_id=%s AND Basic_url.user_id=%s AND Value.tag=%s AND timestamp <= %s AND timestamp >= %s'
         val = (user,id,tag,lower_limit, upper_limit)
         cursor.execute(sql,val)
@@ -160,7 +169,7 @@ class Query:
         
 
     def remove_basic(metric_id,user_id):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'DELETE FROM Basic_url WHERE metric_id = %s AND user_id = %s'
         val = (metric_id,user_id)
         cursor.execute(sql,val)
@@ -168,13 +177,13 @@ class Query:
     
     
     def pause_url(metric_id):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'UPDATE Basic_url SET status=0 WHERE metric_id = %s'
         val = [metric_id]
         cursor.execute(sql,val)
         db.commit()
     def change_basic(metric_id,db_type,user_id):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = "UPDATE Basic_url SET "
         for key in db_type:
             sql += key + ' = ' + str(db_type[key])+','
@@ -186,7 +195,7 @@ class Query:
         cursor.execute(sql)
         db.commit()
     def change_key(metric_id,db_type,user_id):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = "UPDATE Key_url SET "
         for key in db_type:
             sql += key + '=' + str(db_type[key])+','
@@ -195,7 +204,7 @@ class Query:
         cursor.execute(sql)
         db.commit()
     def change_http(metric_id,db_type,user_id):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = "UPDATE Http_url SET "
         for key in db_type:
             sql += key + '=' + str(db_type[key])+','
@@ -204,7 +213,7 @@ class Query:
         cursor.execute(sql)
         db.commit()
     def change_token(metric_id,db_type,user_id):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = "UPDATE Token_url SET "
         for key in db_type:
             sql += key + '=' + str(db_type[key])+','
@@ -214,7 +223,7 @@ class Query:
         db.commit()
 
     def check_basics_id(metric_id):
-        cursor.execute("USE "+Config.database)
+        cursor.execute("USE "+database)
         sql = 'SELECT * FROM Basic_url WHERE metric_id = %s'
         val = [metric_id]
         cursor.execute(sql,val)
@@ -456,7 +465,7 @@ def api_remove_basic():
     if not request.form.get('user_id'): 
         return 'Missing [user_id] Argument',400
     
-    #Query.remove_basic(request.form.get('id'),request.form.get('user_id'))
+    Query.remove_basic(request.form.get('id'),request.form.get('user_id'))
     return 'URL REMOVED',201
 
 @app.route('/URL/Update/Basic',methods=['POST'])
@@ -616,6 +625,6 @@ def home():
 	return 'URL_API'
 
 if __name__ == "__main__":
-    app.run(host=Config.ip,port=Config.port,debug=True)
+    app.run(host="localhost",port=8000,debug=True)
     cursor.close()
     db.close()
