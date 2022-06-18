@@ -1,6 +1,7 @@
 import * as winston from "winston";
 import * as morgan from 'morgan';
 import {RequestHandler} from "express";
+import {DEBUG} from '@/const';
 
 export const log = console.log;
 export const warn = console.warn;
@@ -20,7 +21,7 @@ export const logger = winston.createLogger({
         logFormat,
     ),
     exitOnError: false,
-    level: 'info',
+    level: DEBUG? 'debug':'info',
     transports: [
         new (winston.transports.Console)(),
         new (winston.transports.File)({ filename: 'app.log'})
