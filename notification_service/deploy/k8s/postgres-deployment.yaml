@@ -63,6 +63,6 @@ metadata:
 spec:
   ports:
     - port: 5432
-      targetPort: db-port
+      targetPort: 5432
   selector:
     app: notification-service-db

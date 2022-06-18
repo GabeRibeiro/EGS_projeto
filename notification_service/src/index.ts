@@ -6,7 +6,7 @@ import {createServer} from "http";
 import {Server as ServerSIO} from "socket.io";
 import {authMidllewareSIO} from "@/middlewares";
 import {socketHandler} from "@/socketio";
-import {testConnection} from "@/db";
+import {initDB} from "@/db";
 
 import {logger} from '@/logger';
 
@@ -27,13 +27,7 @@ io.on("connection", socketHandler);
 const port = process.env.SERVER_PORT; // default port to listen
 httpServer.listen( port, () => {
     console.log( `server started at http://localhost:${ port }` );
-
-    testConnection().then(() => {
-        logger.info('🟢 The database is connected.');
-    })
-    .catch(error => {
-        logger.error(`🔴 Unable to connect to the database: ${error}.`);
-    })
+    initDB();
 } );
 
 

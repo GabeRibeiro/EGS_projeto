@@ -1,7 +1,30 @@
 import {Pool} from 'pg';
 import {NotificationModel} from "@/db/models/Notification.model";
+import {logger} from "@/logger";
 
-export const pool = new Pool();
+const getPool = (() => {
+    let _pool = null;
+    return (() => {
+        if(!_pool) {
+            _pool = new Pool();
+        }
+        let connected = false;
+        while(!connected) {
+            testConnection().then(() => {
+                logger.info('🟢 The database is connected.');
+                connected = true;
+            })
+                .catch(error => {
+                    logger.error(`🔴 Unable to connect to the database: ${error}.`);
+                })
+        }
+        return _pool;
+    });
+})();
+
+export const initDB = getPool;
+
+export const pool = getPool();
 
 export const testConnection = async () => {
     return await pool.query("SELECT NOW()");
