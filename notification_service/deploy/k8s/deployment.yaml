@@ -4,7 +4,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: notification-service-app
-  namespace: jfs4
+  namespace: egs4
 spec:
   replicas: 1
   selector:
@@ -18,7 +18,7 @@ spec:
       containers:
         - name: notification-service-app
           # todo change to prod one
-          image: registry.deti:5000/jfs4/notification-service:beta
+          image: registry.deti:5000/egs4/notification-service:latest
           resources:
             requests:
               memory: "32Mi"
@@ -36,6 +36,8 @@ spec:
                 name: notification-service-config
           env:
             - name: DEBUG
+              value: "true"
+            - name: AUTH_DEBUG
               value: "true"
 
             - name: PGPASSWORD
@@ -63,10 +65,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: notification-service-main
-  namespace: jfs4
+  namespace: egs4
 spec:
   ports:
-    - port: 80
+    - port: 10000
       targetPort: app-cont-port
   selector:
     app: notification-service-app
