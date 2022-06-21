@@ -119,21 +119,6 @@ spec:
             port: 
               number: 80
 
-#DB THINGS
-#Create db secrets
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: authratecheck-service-secrets
-  namespace: egs4
-type: Opaque
-data:
-  # db password
-  USER: cm9vdA==
-  # email account password
-  PWD: ZWdzNGJvZGFz
-
 # Create mongo persistent claim
 ---
 apiVersion: v1
@@ -193,3 +178,18 @@ spec:
         - name: mongo-persistent-storage
           persistentVolumeClaim:
             claimName: authratecheck-pvc
+
+#DB THINGS
+#Create db secrets
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: authratecheck-service-secrets
+  namespace: egs4
+type: Opaque
+data:
+  # db password
+  USER: cm9vdA==
+  # email account password
+  PWD: ZWdzNGJvZGFz

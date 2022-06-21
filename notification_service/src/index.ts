@@ -26,7 +26,7 @@ io.on("connection", socketHandler);
 // start the Express server
 const port = process.env.SERVER_PORT; // default port to listen
 httpServer.listen( port, () => {
-    console.log( `server started at http://localhost:${ port }` );
+    logger.info( `server started at http://localhost:${ port }` );
     initDB();
 } );
 
