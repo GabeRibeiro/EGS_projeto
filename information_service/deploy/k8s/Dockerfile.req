@@ -1,7 +1,7 @@
 # snx -s go.ua.pt -u alexandretomas@ua.pt
 # kubectl apply -f deploy/k8s/requester-secret.yaml
-# sudo docker build --tag registry.deti:5000/requester-service:v3 --file deploy/k8s/Dockerfile.req .
-# sudo docker push registry.deti:5000/requester-service:v3
+# sudo docker build --tag registry.deti:5000/requester-service:v1 --file deploy/k8s/Dockerfile.req .
+# sudo docker push registry.deti:5000/requester-service:v1
 # kubectl apply -f deploy/k8s/requester-deployment.yaml
 FROM python:3.8-alpine
 
@@ -22,9 +22,6 @@ COPY app/make_requests.py make_requests.py
 COPY app/make_requests_utils.py make_requests_utils.py
 COPY app/requests.sh requests.sh
 
-#EXPOSE 8080/tcp
-
 RUN chmod +x requests.sh  
 
 CMD ["./requests.sh"]
-# after do docker run

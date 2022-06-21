@@ -1,7 +1,7 @@
 # snx -s go.ua.pt -u alexandretomas@ua.pt
 # kubectl apply -f deploy/k8s/information-secret.yaml
-# sudo docker build --tag registry.deti:5000/information-service:v3 --file deploy/k8s/Dockerfile.api .
-# sudo docker push registry.deti:5000/information-service:v3
+# sudo docker build --tag registry.deti:5000/information-service:v1 --file deploy/k8s/Dockerfile.api .
+# sudo docker push registry.deti:5000/information-service:v1
 # kubectl apply -f deploy/k8s/info-deployment.yaml
 
 
@@ -35,11 +35,3 @@ RUN chmod +x startup.sh
 EXPOSE 8000/tcp
 
 CMD ["./startup.sh"]
-
-
-
-
-
-
-
-# docker run image bin.sh

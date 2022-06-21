@@ -1,0 +1,25 @@
+-- database --
+
+kubectl apply -f deploy/k8s/mysql-secret.yaml
+kubectl apply -f deploy/k8s/configmap.yaml
+kubectl apply -f deploy/k8s/mysql-storage.yaml
+kubectl apply -f deploy/k8s/mysql-deployment.yaml
+
+
+
+kubectl apply -f deploy/k8s/mysql-services.yaml
+
+
+-- information-service --
+
+kubectl apply -f deploy/k8s/information-secret.yaml
+sudo docker build --tag registry.deti:5000/information-service:v31 --file deploy/k8s/Dockerfile.api .
+sudo docker push registry.deti:5000/information-service:v31
+kubectl apply -f deploy/k8s/info-deployment.yaml
+
+-- requests-service --
+
+kubectl apply -f deploy/k8s/requester-secret.yaml
+sudo docker build --tag registry.deti:5000/requester-service:v13 --file deploy/k8s/Dockerfile.req .
+sudo docker push registry.deti:5000/requester-service:v13
+kubectl apply -f deploy/k8s/requester-deployment.yaml

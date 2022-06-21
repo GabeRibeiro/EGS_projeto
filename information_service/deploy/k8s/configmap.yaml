@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: information-service-config
-  namespace: zedleague
+  namespace: egs4
 data:
   SERVER_PORT: "3306"
   # DB access credentials
@@ -16,7 +16,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: information-service-config-db
-  namespace: zedleague
+  namespace: egs4
 data:
   # DB access credentials
   MYSQL_USER: "mysql"
