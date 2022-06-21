@@ -34,10 +34,18 @@ spec:
         image: registry.deti:5000/ratecheck/bodas-mongodb:v3
         env:
         - name: MONGO_INITDB_ROOT_USERNAME
-          value: root
+          valueFrom:
+            secretKeyRef:
+              name: authratecheck-service-secrets
+              key: USER
+              optional: false
 
         - name: MONGO_INITDB_ROOT_PASSWORD
-          value: egs4bodas
+          valueFrom:
+            secretKeyRef:
+              name: authratecheck-service-secrets
+              key: PWD
+              optional: false
         
         ports:
         - containerPort: 27017
@@ -50,7 +58,7 @@ spec:
           persistentVolumeClaim:
             claimName: authratecheck-pvc
 
-# Create api deployment
+# Create app deployment
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -166,3 +174,17 @@ spec:
             name: nginx
             port: 
               number: 80
+
+#Secrets for db
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: authratecheck-service-secrets
+  namespace: egs4
+type: Opaque
+data:
+  # db password
+  USER: cm9vdA==
+  # email account password
+  PWD: ZWdzNGJvZGFz

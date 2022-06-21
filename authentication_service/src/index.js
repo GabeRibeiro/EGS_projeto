@@ -94,7 +94,7 @@ app.post('/login', async (req, res) => {
     
     //Create and assign a token
     const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET, {expiresIn: '6h'})
-    res.header('auth-token', token).status(200).send("Success")
+    res.header('auth-token', token).status(200).redirect("Success")
     
 })
 
@@ -103,9 +103,7 @@ app.post('/login', async (req, res) => {
 app.get('/verifyToken', verify,  async (req,res) => {
 
     res.status(200).send("Succesful")
-   
-    
-    
+        
 })
 
 
