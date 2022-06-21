@@ -2,6 +2,7 @@ import {SocketWithUser} from "@/interfaces/auth.interface";
 import {logger} from "@/logger";
 import * as db from '@/db';
 import {NotificationModel} from "@/db/models/Notification.model";
+import {registerSub, unlisten} from "@/db/listen";
 
 const ioSocketMap = new Map<string, SocketWithUser>();
 
@@ -16,17 +17,25 @@ export const socketHandler = async (socket:SocketWithUser) => {
     logger.debug('@socketHandler User connected: '+uid);
     socket.on('disconnect',  () => {
         ioSocketMap.delete(uid);
+        unlisten(uid);
         logger.debug('@socketHandler User disconnected: '+uid);
     });
     // register socket with a user
     ioSocketMap.set(uid, socket);
     // look for dormant notification
-    const notificationsDB = await db.getDormantNotifications(uid);
+    const notificationsDB = await db.getDormantNotificationTransction(uid);
     for(const n of notificationsDB) {
-        console.log('n: '+n)
         socket.emit(SocketEvents.NewNotification, JSON.stringify(n));
     }
-    await db.deleteDormantNotifications(uid);
+
+    registerSub(uid, async (payload) => {
+        // tslint:disable-next-line:no-shadowed-variable
+        const notificationsDB = await db.getDormantNotificationTransction(uid);
+        for(const n of notificationsDB) {
+            console.log('@socketHandler n: '+n.txt )
+            socket.emit(SocketEvents.NewNotification, JSON.stringify(n));
+        }
+    });
 }
 
 export const getUserSocket = (uid: string) => {

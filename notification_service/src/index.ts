@@ -9,6 +9,7 @@ import {socketHandler} from "@/socketio";
 import {initDB} from "@/db";
 
 import {logger} from '@/logger';
+import {initListenNotify} from "@/db/listen";
 
 const httpServer = createServer(app);
 
@@ -28,6 +29,7 @@ const port = process.env.SERVER_PORT; // default port to listen
 httpServer.listen( port, () => {
     logger.info( `server started at http://localhost:${ port }` );
     initDB();
+    initListenNotify()
 } );
 
 

@@ -1,9 +1,9 @@
 import * as nodemailer from 'nodemailer';
 import {NotificationDto} from "@/features/sendNotification/Notification.dto";
-import {notifyUser} from "@/socketio";
 import {logger} from "@/logger";
-import {insertNotification} from "@/db";
+import {insertNotification, insertDormantNotificationModel} from "@/db";
 import {NotificationModel} from "@/db/models/Notification.model";
+import {emitNotify} from "@/db/listen";
 
 const _emailSubject = "Price Update!";
 
@@ -54,6 +54,8 @@ export const persistNotification = async (notification:NotificationDto): Promise
 }
 
 export async function notifyQueue(notification:NotificationModel) {
-    await notifyUser(notification.uid, notification);
+    await insertDormantNotificationModel(notification);
+    await emitNotify(notification.uid, notification.txt);
+    // await notifyUser(notification.uid, notification);
 }
 
