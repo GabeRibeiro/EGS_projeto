@@ -1,20 +1,25 @@
+#sudo docker build -t registry.deti:5000/ratecheck/bodas-api:v14  -f deploy/Dockerfile.api .
+#sudo docker push registry.deti:5000/ratecheck/bodas-api:v14
+
+
 FROM node:18
 
 # Create app directory
 RUN mkdir /src
 WORKDIR /src
 
+RUN apt update && apt install -y netcat && apt install -y iputils-ping && apt install -y telnet
 
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
 COPY ./src/package.json ./src/package-lock.json ./
-COPY ./src/index.js ./src/validation.js ./src/routes/ ./src/node_modules/ ./src/model/ ./src/views/ ./src/.env ./src/
+COPY ./src/index.js ./src/validation.js ./src/routes/ ./src/model/ ./src/views/ ./src/.env ./src/
 
-RUN npm install
-   
+RUN npm install 
 # If you are building your code for production
 # RUN npm ci --only=production
 
 COPY ./src .
+RUN chmod +x initapp.sh 
 
-CMD npm start
+ENTRYPOINT ["./initapp.sh"]

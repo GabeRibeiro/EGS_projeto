@@ -7,7 +7,7 @@ metadata:
     type: local
 spec:
   capacity:
-    storage: 50M
+    storage: 500M
   accessModes:
     - ReadWriteOnce
   hostPath:
@@ -24,4 +24,4 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 50M
+      storage: 500M

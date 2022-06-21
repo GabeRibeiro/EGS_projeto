@@ -1,0 +1,5 @@
+#sudo docker build -t registry.deti:5000/ratecheck/bodas-nginx:v4 -f deploy/Dockerfile.nginx .
+#sudo docker push registry.deti:5000/ratecheck/bodas-nginx:v4
+
+FROM nginx
+COPY deploy/nginx.conf /etc/nginx/nginx.conf
