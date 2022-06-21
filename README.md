@@ -3,7 +3,7 @@ Projeto_EGS
 
 
 Swagger Auth
-https://app.swaggerhub.com/apis/GabeRibeiro/Teste1/1.0.0
+https://app.swaggerhub.com/apis/GabeRibeiro/AuthEGSGrupo4/v3
 
 Swagger Notificações [here](./notification_service/docs/api.yaml)
 

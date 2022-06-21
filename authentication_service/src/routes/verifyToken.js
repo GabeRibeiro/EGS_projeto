@@ -8,10 +8,8 @@ module.exports = function (req, res, next){
     try {
         const verified = jwt.verify(token, process.env.TOKEN_SECRET)
         req.user = verified
-        next()
+        res.status(200).send("Token verified successfully!")
     } catch (error) {
-        res.status(400).json({
-            message: 'Login Failed. Bad Token',
-        })
+        res.status(400).send("Token failed to verify!")
     }
 }
