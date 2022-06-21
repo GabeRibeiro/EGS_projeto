@@ -120,12 +120,13 @@ class Query:
                 database = database
             )
         cursor = db.cursor()
-        sql = 'SELECT * FROM Basic_url WHERE metric_id = %s'
+        sql = 'SELECT * FROM Key_url WHERE parent_id = %s'
         val = [metric_id]
         cursor.execute(sql,val)
+        value = (cursor.fetchall())[0]
         cursor.close()
         db.close()
-        return (cursor.fetchall())[0]
+        return value
     def get_http(metric_id):
         db = mysql.connector.connect(
                 host=host,
@@ -135,12 +136,13 @@ class Query:
                 database = database
             )
         cursor = db.cursor()
-        sql = 'SELECT * FROM Basic_url WHERE metric_id = %s'
+        sql = 'SELECT * FROM Http_url WHERE parent_id = %s'
         val = [metric_id]
         cursor.execute(sql,val)
+        value = (cursor.fetchall())[0]
         cursor.close()
         db.close()
-        return (cursor.fetchall())[0]
+        return value
     def get_token(metric_id):
         db = mysql.connector.connect(
                 host=host,
@@ -150,12 +152,13 @@ class Query:
                 database = database
             )
         cursor = db.cursor()
-        sql = 'SELECT * FROM Basic_url WHERE metric_id = %s'
+        sql = 'SELECT * FROM Token_url WHERE parent_id = %s'
         val = [metric_id]
         cursor.execute(sql,val)
+        value = (cursor.fetchall())[0]
         cursor.close()
         db.close()
-        return (cursor.fetchall())[0]
+        return value
     def pause_url(metric_id):
         db = mysql.connector.connect(
                 host=host,
@@ -170,6 +173,8 @@ class Query:
         val = [metric_id]
         cursor.execute(sql,val)
         db.commit()
+        cursor.close()
+        db.close()
     def add_value(url_id,tag,value):
         db = mysql.connector.connect(
                 host=host,
@@ -184,6 +189,8 @@ class Query:
         val = (url_id,tag,value)
         cursor.execute(sql,val)
         db.commit()
+        cursor.close()
+        db.close()
 
 def make_request(period):
     for val in Query.get_requests_period(period):
@@ -197,7 +204,6 @@ def make_request(period):
             key_url = Query.get_key(val[0])
             request_key(val[0],val[1],val[3],val[4],key_url[1])
         else:
-            print(val)
             request_basic(val[0],val[1],val[3],val[4])
 
 def main():

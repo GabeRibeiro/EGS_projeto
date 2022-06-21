@@ -7,9 +7,9 @@ metadata:
 data:
   SERVER_PORT: "3306"
   # DB access credentials
-  PGHOST: "information-service-db-service"
-  PGDATABASE: "mysql"
-  PGUSER: "mysql"
+  SQLHOST: "information-service-db-service"
+  SQLDATABASE: "mysql"
+  SQLUSER: "mysql"
 ---
 # mysql DB 'exclusive' config
 apiVersion: v1

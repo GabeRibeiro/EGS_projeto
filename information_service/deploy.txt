@@ -13,8 +13,8 @@ kubectl apply -f deploy/k8s/mysql-services.yaml
 -- information-service --
 
 kubectl apply -f deploy/k8s/information-secret.yaml
-sudo docker build --tag registry.deti:5000/information-service:v31 --file deploy/k8s/Dockerfile.api .
-sudo docker push registry.deti:5000/information-service:v31
+sudo docker build --tag registry.deti:5000/information-service:v36 --file deploy/k8s/Dockerfile.api .
+sudo docker push registry.deti:5000/information-service:v36
 kubectl apply -f deploy/k8s/info-deployment.yaml
 
 -- requests-service --
