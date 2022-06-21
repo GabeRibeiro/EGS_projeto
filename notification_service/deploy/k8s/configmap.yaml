@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: notification-service-config
-  namespace: jfs4
+  namespace: egs4
 data:
   SERVER_PORT: "10000"
   # DB access credentials
@@ -13,7 +13,7 @@ data:
   #PGPASSWORD in secret
   # Auth Service's endpoint to verify auth tokens (full URL)
   # todo: define at project level
-  AUTHSERVICE_VERIFY_URL: "authservice/verifyToken"
+  AUTHSERVICE_VERIFY_URL: "http://ratecheckapi/verifyToken"
   # Which mail service will be used (ex: 'hotmail')
   MAILSERVICE: "gmail"
   MAILACCOUNT: "noreply.jfs4@gmail.com"
@@ -24,7 +24,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: notification-service-config-db
-  namespace: jfs4
+  namespace: egs4
 data:
   # DB access credentials
   POSTGRES_USER: "postgres"

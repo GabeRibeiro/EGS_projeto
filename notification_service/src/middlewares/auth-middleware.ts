@@ -5,6 +5,7 @@ import {RequestWithUser, SocketWithUser} from "@/interfaces/auth.interface";
 import HttpException from "@/exceptions/HTTPException.exception";
 import {User} from "@/interfaces/user.interface";
 import {logger} from "@/logger";
+import {AUTH_DEBUG} from "@/const";
 
 /**
  * validates an auth token and returns a User (user.interface).
@@ -16,23 +17,25 @@ const validateAuthToken = async (token:string)  => {
         return null;
     }
 
-    if(process.env.DEBUG.valueOf() === "true".valueOf()) {
-        logger.info("@validateAuthToken DEBUG MODE")
+    if(AUTH_DEBUG) {
+        logger.debug("@validateAuthToken DEBUG MODE")
         return {uid: token} as User;
     }
 
     // check validity of the token with auth service
     let response = null;
     try {
+        logger.debug("@validateAuthToken url: "+process.env.AUTHSERVICE_VERIFY_URL)
         response = await axios({
             url:process.env.AUTHSERVICE_VERIFY_URL,
-            method: "POST",
             headers: {
                 [process.env.AUTHSERVICE_VERIFY_HEADER]: token.replace(/(\r\n|\n|\r)/gm, "")
             }
         })
     }
     catch (err) {
+        logger.error("@validateAuthToken error:")
+        logger.error(err)
         return null
     }
 
@@ -45,7 +48,7 @@ const validateAuthToken = async (token:string)  => {
     // get token data (jwt format)
     const tokenData = await jwt.decode(token);
 
-    console.log("@validateAuthToken token ok")
+    logger.debug("@validateAuthToken token ok")
 
     return {uid: tokenData._id} as User;
 }

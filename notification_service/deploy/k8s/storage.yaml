@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: notification-service-app-jfs-pvc
-  namespace: jfs4
+  namespace: egs4
 spec:
   accessModes:
     - ReadWriteOnce

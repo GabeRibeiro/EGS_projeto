@@ -1,56 +1,6 @@
-# Create mongo persistent claim
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: authratecheck-pvc
-  namespace: egs4
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: longhorn
-  resources:
-    requests:
-      storage: 500Mi
 
-# Create database deployment
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: authratecheck-db
-  namespace: egs4
-spec:
-  selector:
-    matchLabels:
-      app: authratecheck-db
-  template:
-    metadata:
-      labels:
-        app: authratecheck-db
-    spec:
-      containers:
-      - name: mongo
-        image: registry.deti:5000/ratecheck/bodas-mongodb:v3
-        env:
-        - name: MONGO_INITDB_ROOT_USERNAME
-          value: root
-
-        - name: MONGO_INITDB_ROOT_PASSWORD
-          value: egs4bodas
-        
-        ports:
-        - containerPort: 27017
-          name: mongodb
-        volumeMounts:
-          - name: mongo-persistent-storage
-            mountPath: /var/lib/mongodb
-      volumes:
-        - name: mongo-persistent-storage
-          persistentVolumeClaim:
-            claimName: authratecheck-pvc
-
-# Create api deployment
+#Deployments
+# Create app deployment
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -128,6 +78,8 @@ spec:
   selector:
     app: ratecheckapi
 
+#PROXY THINGS
+
 # Create nginx service
 ---
 apiVersion: v1
@@ -166,3 +118,78 @@ spec:
             name: nginx
             port: 
               number: 80
+
+# Create mongo persistent claim
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: authratecheck-pvc
+  namespace: egs4
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 500Mi
+
+# Create database deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authratecheck-db
+  namespace: egs4
+spec:
+  selector:
+    matchLabels:
+      app: authratecheck-db
+  template:
+    metadata:
+      labels:
+        app: authratecheck-db
+    spec:
+      containers:
+      - name: mongo
+        image: registry.deti:5000/ratecheck/bodas-mongodb:v3
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: authratecheck-service-secrets
+              key: USER
+              optional: false
+
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: authratecheck-service-secrets
+              key: PWD
+              optional: false
+        
+        ports:
+        - containerPort: 27017
+          name: mongodb
+        volumeMounts:
+          - name: mongo-persistent-storage
+            mountPath: /var/lib/mongodb
+      volumes:
+        - name: mongo-persistent-storage
+          persistentVolumeClaim:
+            claimName: authratecheck-pvc
+
+#DB THINGS
+#Create db secrets
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: authratecheck-service-secrets
+  namespace: egs4
+type: Opaque
+data:
+  # db password
+  USER: cm9vdA==
+  # email account password
+  PWD: ZWdzNGJvZGFz
