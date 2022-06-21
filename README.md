@@ -9,3 +9,4 @@ Swagger Notificações [here](./notification_service/docs/api.yaml)
 
 
 Swagger Recolha dados
+https://app.swaggerhub.com/apis/zedleague/information-service/1.0.0

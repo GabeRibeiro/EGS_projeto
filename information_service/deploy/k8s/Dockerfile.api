@@ -1,0 +1,37 @@
+# snx -s go.ua.pt -u alexandretomas@ua.pt
+# kubectl apply -f deploy/k8s/information-secret.yaml
+# sudo docker build --tag registry.deti:5000/information-service:v1 --file deploy/k8s/Dockerfile.api .
+# sudo docker push registry.deti:5000/information-service:v1
+# kubectl apply -f deploy/k8s/info-deployment.yaml
+
+
+FROM python:3.8-alpine
+
+MAINTAINER Alexandre Oliveira
+
+LABEL version="1.0"
+
+# Create app directory
+RUN mkdir /app
+WORKDIR /app
+
+COPY app/requirements.txt requirements.txt
+
+RUN python3 -m pip install --upgrade pip
+RUN pip install -r requirements.txt
+
+
+#COPY app/utils.py utils.py
+#COPY app/config.py config.py
+#COPY app/config.json config.json
+#COPY app/make_requests.py make_requests.py
+#COPY app/make_requests_utils.py make_requests_utils.py
+COPY app/api_methods.py api_methods.py
+COPY app/startup.sh startup.sh
+#COPY app/requests.sh requests.sh
+
+RUN chmod +x startup.sh
+
+EXPOSE 8000/tcp
+
+CMD ["./startup.sh"]

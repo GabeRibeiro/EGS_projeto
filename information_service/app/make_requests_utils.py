@@ -9,16 +9,9 @@ def request_basic(metric_id,url,value,tag):
     request = requests.get(url,timeout=40)
     if request.status_code == 200: 
         try:
-        #if True:
             db_entrys = filter_entrys(request.json(),tag,value)
             if db_entrys:
-                #if True:
                 try:
-                    #print('entrys')
-                    #print(request.json())
-                    #print('\n\n')
-                    #print(db_entrys)
-                    #print('\n')
                     for entry in [entry for entry in db_entrys if entry]:
                         print(entry)
                         Query.add_value(metric_id,entry[0],entry[1])

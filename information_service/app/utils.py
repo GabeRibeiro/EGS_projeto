@@ -1,7 +1,3 @@
-# ficheiro com utils como make request
-# get token
-# make request_key
-# make request_open
 import requests
 import json
 import base64
@@ -16,7 +12,6 @@ def make_request(url):
         return r.json()
     return display_error(r.status_code)
         
-
 def make_request_key(url,key):
     return requests.get(url,headers={'Authorization': key},timeout=15)
    
@@ -30,7 +25,6 @@ def make_request_token(url,token):
 # para o wso2 content_type -> application/x-www-form-urlencoded | auth_type -> Bearer
 def get_token(url,key,secret,content_type=None,auth_type=None):
     msg = encode_b64(key+':'+secret)
-    #print(msg=='al9tR25keEsyV0xLRVVLYkdya1g3bjF1eEFFYTpCcnN6SDhvRjlRc0hSamlPQUMxRDlaZTBJbG9h')
     request_token = requests.post(url,headers={'Content-Type': content_type, 'Authorization': 'Basic '+msg},timeout=15)
     if request_token.status_code < 400:
         return auth_type + ' ' + request_token.json()['access_token'] if auth_type else request_token.json()
@@ -56,12 +50,6 @@ def get_timestamp():
 
 def epoch2utc(timestamp):
     return datetime.fromtimestamp(timestamp, pytz.utc)
-
-#def create_entry(measurement, tags, timestamp, fields):
-#    """
-#    creates a json like influx db entry
-#    """
-#    return [{"measurement": measurement, "tags" : tags, "time" : timestamp, "fields": fields}]
 
 def filter_entrys(data,tag,value):
     entrys = []
