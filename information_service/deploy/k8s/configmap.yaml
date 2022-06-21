@@ -40,6 +40,7 @@ data:
     CREATE TABLE Key_url( 
             metric_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
             secret_key VARCHAR(255) NOT NULL,
+            secret_header VARCHAR(255) NOT NULL,
             parent_id INT NOT NULL,
             
             FOREIGN KEY (parent_id) REFERENCES Basic_url(metric_id) ON DELETE CASCADE

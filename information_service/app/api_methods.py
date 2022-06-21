@@ -81,7 +81,7 @@ class Query:
         cursor.close()
         db.close()
 
-    def add_key(parent_id,key):
+    def add_key(parent_id,key,secret_header):
         db = mysql.connector.connect(
             host=host,
             user=user,
@@ -91,8 +91,8 @@ class Query:
         )
         cursor = db.cursor()
         cursor.execute("USE "+database)
-        sql = 'INSERT INTO Key_url (parent_id,secret_key) VALUES (%s,%s)'
-        val = (parent_id,key)
+        sql = 'INSERT INTO Key_url (parent_id,secret_key,secret_header) VALUES (%s,%s,%s)'
+        val = (parent_id,key,secret_header)
         cursor.execute(sql,val)
         db.commit()
         cursor.close()
@@ -181,7 +181,7 @@ class Query:
         values.extend(cursor.fetchall())
         
         sql = '''
-                SELECT Basic_url.metric_id,url,value,tag,period,status,secret_key FROM Basic_url,Key_url WHERE user_id = %s AND parent_id = Basic_url.metric_id 
+                SELECT Basic_url.metric_id,url,value,tag,period,status,secret_key,secret_header FROM Basic_url,Key_url WHERE user_id = %s AND parent_id = Basic_url.metric_id 
               '''
         cursor.execute(sql,val)
         values.extend(cursor.fetchall())
@@ -461,11 +461,11 @@ def api_add_URL_key():
         return "Missing [value] Argument",400 
         
     period = 5 if not request.form.get('period') else request.form.get('period')
-    
+    secret_header = 'Authorization' if not request.form.get('secret_header') else request.form.get('secret_header')
     Query.add_basic(request.form.get('url'),request.form.get('user_id'),request.form.get('value'),request.form.get('tag'),period,True,'key')    
     
     id = Query.last_insertedID()[0]
-    Query.add_key(id,request.form.get('key'))
+    Query.add_key(id,request.form.get('key'),secret_header)
     
     return "URL RUNNING!",201
 
