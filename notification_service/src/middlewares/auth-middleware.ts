@@ -25,15 +25,17 @@ const validateAuthToken = async (token:string)  => {
     // check validity of the token with auth service
     let response = null;
     try {
+        logger.debug("@validateAuthToken url: "+process.env.AUTHSERVICE_VERIFY_URL)
         response = await axios({
             url:process.env.AUTHSERVICE_VERIFY_URL,
-            method: "POST",
             headers: {
                 [process.env.AUTHSERVICE_VERIFY_HEADER]: token.replace(/(\r\n|\n|\r)/gm, "")
             }
         })
     }
     catch (err) {
+        logger.error("@validateAuthToken error:")
+        logger.error(err)
         return null
     }
 

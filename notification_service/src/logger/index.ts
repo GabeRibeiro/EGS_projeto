@@ -13,6 +13,9 @@ const { combine, timestamp, printf } = winston.format;
 // tslint:disable-next-line:no-shadowed-variable
 const logFormat = printf(({ timestamp, level, message }) => `${timestamp} ${level}: ${message}`);
 
+const loggerLevel = DEBUG? 'debug':'info';
+console.log("Logger level: "+loggerLevel);
+
 export const logger = winston.createLogger({
     format: combine(
         timestamp({
@@ -21,7 +24,7 @@ export const logger = winston.createLogger({
         logFormat,
     ),
     exitOnError: false,
-    level: DEBUG? 'debug':'info',
+    level: loggerLevel,
     transports: [
         new (winston.transports.Console)(),
         new (winston.transports.File)({ filename: 'app.log'})
