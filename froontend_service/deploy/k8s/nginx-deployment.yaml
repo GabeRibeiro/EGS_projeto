@@ -1,0 +1,87 @@
+# Create nginx deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-nginx
+  namespace: ricardo-84730
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-nginx
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: frontend-nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          resources:
+            limits:
+              memory: "128Mi"
+            requests:
+              memory: "100Mi"
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: frontend-nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+      restartPolicy: Always
+      volumes:
+        - name: frontend-nginx-config
+          configMap:
+            name: frontend-nginx-config
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+
+# Create Service for Nginx
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-nginx
+  namespace: ricardo-84730
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: frontend-nginx
+
+# NGINX Config map
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-nginx-config
+  namespace: ricardo-84730
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes 1;
+    error_log   /var/log/nginx/error.log warn;
+    pid         /var/run/nginx.pid;
+
+    events {
+        worker_connections 1024;
+    }
+
+    http{
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+        sendfile        on;
+        server {
+            listen       80 default_server;
+            server_name  egs4.k3s;
+            error_page   500 502 503 504  /50x.html;
+            location / {
+                proxy_pass http://frontend-server:8080/;
+            }
+        }
+    }

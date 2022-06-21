@@ -7,7 +7,7 @@ import { Dialog } from "primereact/dialog";
 import { Divider } from "primereact/divider";
 import { classNames } from "primereact/utils";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "../../context/Auth/AuthProvider";
 
 import "../../assets/css/FormDemo.css";
 
@@ -31,11 +31,10 @@ export default function LoginForm() {
 
   const onSubmit = (data) => {
     const onError = (error, message = null) => {
-      if (error) {
-        setShowMessage(true);
-        setError(message);
-        reset(data);
-      } else navigate("../", { replace: true });
+      if (!error) navigate("../", { replace: true });
+      setShowMessage(true);
+      setError(message);
+      reset(data);
     };
 
     console.log(data);
