@@ -1,0 +1,11 @@
+
+#sudo docker build -t registry.deti:5000/ratecheck/bodas-mongodb:v5 -f deploy/Dockerfile.db .
+#sudo docker push registry.deti:5000/ratecheck/bodas-mongodb:v5
+
+FROM mongo:4.4
+
+LABEL Gabriel Ribeiro EGS
+
+ADD deploy/init-mongo.js /docker-entrypoint-initdb.d
+
+EXPOSE 27017

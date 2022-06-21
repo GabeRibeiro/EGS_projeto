@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken')
 const verify = require('./routes/verifyToken')
 const { registerValidation, loginValidation } = require('./validation')
 
-const url = 'mongodb://root:123456@mongo:27017';
+const url = 'mongodb://root:egs4bodas@authratecheck-db:27017/';
 
 app.set('view-engine', 'ejs')
 
@@ -69,7 +69,7 @@ app.post('/register', async (req, res) => {
 
     try {
         const savedUser = await user.save()
-        res.send({user: user._id})
+        res.status(200).redirect('/login')
     } catch (err) {
         res.status(400).send(err)
     }
@@ -94,7 +94,7 @@ app.post('/login', async (req, res) => {
     
     //Create and assign a token
     const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET, {expiresIn: '6h'})
-    res.header('auth-token', token).send({user: user._id}).status(200)
+    res.header('auth-token', token).status(200).send("Success")
     
 })
 
@@ -102,15 +102,13 @@ app.post('/login', async (req, res) => {
 
 app.get('/verifyToken', verify,  async (req,res) => {
 
-    res.json({
-        message: 'Sucessfully logged in',
-    })
-    res.status(200)
+    res.status(200).send("Succesful")
+   
     
     
 })
 
 
 
-app.listen(3000, () => console.log('Server running'))
+app.listen(3555, () => console.log('Server running'))
 

@@ -1,0 +1,168 @@
+# Create mongo persistent claim
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: authratecheck-pvc
+  namespace: egs4
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 500Mi
+
+# Create database deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authratecheck-db
+  namespace: egs4
+spec:
+  selector:
+    matchLabels:
+      app: authratecheck-db
+  template:
+    metadata:
+      labels:
+        app: authratecheck-db
+    spec:
+      containers:
+      - name: mongo
+        image: registry.deti:5000/ratecheck/bodas-mongodb:v3
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: root
+
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          value: egs4bodas
+        
+        ports:
+        - containerPort: 27017
+          name: mongodb
+        volumeMounts:
+          - name: mongo-persistent-storage
+            mountPath: /var/lib/mongodb
+      volumes:
+        - name: mongo-persistent-storage
+          persistentVolumeClaim:
+            claimName: authratecheck-pvc
+
+# Create api deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ratecheckapi
+  namespace: egs4
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ratecheckapi
+  template:
+    metadata:
+      labels:
+        app: ratecheckapi
+    spec:
+      containers:
+      - name: ratecheckapi
+        image: registry.deti:5000/ratecheck/bodas-api:v14
+        ports:
+          - containerPort: 3555
+
+# Create nginx deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: egs4
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - image: registry.deti:5000/ratecheck/bodas-nginx:v3
+          name: nginx
+          ports:
+            - containerPort: 80
+          resources: {}
+      restartPolicy: Always
+
+# Creat database service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: authratecheck-db
+  namespace: egs4
+spec:
+  ports:
+  - port: 27017
+    protocol: TCP
+    targetPort: 27017
+  selector:
+    app: authratecheck-db
+
+#  api service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ratecheckapi
+  namespace: egs4
+spec:
+  ports:
+  - port: 3555
+    targetPort: 3555
+  selector:
+    app: ratecheckapi
+
+# Create nginx service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: egs4
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: nginx
+
+# Configure Traefik ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: auth-ingress
+  namespace: egs4
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/frontend-entry-points: http,https
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
+    traefik.ingress.kubernetes.io/redirect-permanent: "true"
+spec:
+  rules:
+  - host: ratecheck.auth
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx
+            port: 
+              number: 80
