@@ -94,8 +94,9 @@ app.post('/login', async (req, res) => {
     
     //Create and assign a token
     const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET, {expiresIn: '6h'})
-    res.header('auth-token', token).status(200).redirect("Success")
-    
+
+
+    res.header('auth-token', token).status(200).redirect("http://frontend-nginx/?auth-token=" + token)
 })
 
 
