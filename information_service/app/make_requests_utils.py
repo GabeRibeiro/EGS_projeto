@@ -37,8 +37,8 @@ def request_basic(metric_id,url,value,tag):
         print('Internal Server Error')
     return False
 
-def request_key(metric_id,url,value,tag,key):           
-    request = requests.get(url,headers={'Authorization': key},timeout=40)
+def request_key(metric_id,url,value,tag,key,name):           
+    request = requests.get(url,headers={name: key},timeout=40)
     if request.status_code < 400:
             try:
                 db_entrys = filter_entrys(request.json(),tag,value)
@@ -77,7 +77,6 @@ def request_http(metric_id,url,value,tag,username,key):
     if request.status_code < 400:    
         try:
             db_entrys = filter_entrys(request.json(),tag,value)
-
             if db_entrys:
                 try:
                     for entry in db_entrys:

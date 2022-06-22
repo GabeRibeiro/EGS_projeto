@@ -1,5 +1,5 @@
 import {SocketWithUser} from "@/interfaces/auth.interface";
-import * as logger from "@/logger";
+import {logger} from "@/logger";
 import * as db from '@/db';
 import {NotificationModel} from "@/db/models/Notification.model";
 
@@ -13,16 +13,16 @@ export const socketHandler = async (socket:SocketWithUser) => {
         return
     }
 
-    logger.log('User connected: '+uid);
+    logger.debug('@socketHandler User connected: '+uid);
     socket.on('disconnect',  () => {
         ioSocketMap.delete(uid);
-        logger.log('User disconnected: '+uid);
+        logger.debug('@socketHandler User disconnected: '+uid);
     });
     // register socket with a user
     ioSocketMap.set(uid, socket);
     // look for dormant notification
-    const notifications = await db.getDormantNotifications(uid);
-    for(const n of notifications) {
+    const notificationsDB = await db.getDormantNotifications(uid);
+    for(const n of notificationsDB) {
         console.log('n: '+n)
         socket.emit(SocketEvents.NewNotification, JSON.stringify(n));
     }
@@ -43,9 +43,11 @@ export const notifyUser = async (uid:string, n:NotificationModel) => {
 
 
     if (socket) {
+        logger.debug('@notifyUser: notification pushed; uid: '+uid);
         socket.emit(SocketEvents.NewNotification, n);
         return true;
     } else {
+        logger.debug('@notifyUser: notification sent no dormant queue; uid: '+uid);
         await db.insertDormantNotificationModel(n);
         return false;
     }

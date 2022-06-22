@@ -202,7 +202,7 @@ def make_request(period):
             request_http(val[0],val[1],val[3],val[4],http_url[3],http_url[2])
         elif val[7] == 'key':
             key_url = Query.get_key(val[0])
-            request_key(val[0],val[1],val[3],val[4],key_url[1])
+            request_key(val[0],val[1],val[3],val[4],key_url[1],key_url[2])
         else:
             request_basic(val[0],val[1],val[3],val[4])
 

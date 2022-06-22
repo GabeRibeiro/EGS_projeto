@@ -51,21 +51,27 @@ def get_timestamp():
 def epoch2utc(timestamp):
     return datetime.fromtimestamp(timestamp, pytz.utc)
 
-def filter_entrys(data,tag,value):
+def filter_entrys(data,tag,value,val_aux=None):
     entrys = []
-    
-    for field in data:
-        if isinstance(field,str):
-            if isinstance(data[field],dict):
-                entrys += filter_entrys(data[field],tag,value)
-            elif isinstance(data[field],list):
-                entrys += filter_entrys(data[field],tag,value)
-            elif field == tag or field == value:
-                entrys += [(data[tag],data[value])]
-                break
-        elif isinstance(field,dict):
-            entrys += filter_entrys(field,tag,value)
-        elif isinstance(field,list):
-            entrys += filter_entrys(field,tag,value)
-        
+    if isinstance(data,dict):
+        for field in data:
+            if isinstance(field,str):
+                if field == tag:
+                    val_aux = data[field]
+                if isinstance(data[field],dict):
+                    entrys += filter_entrys(data[field],tag,value,val_aux)
+                elif isinstance(data[field],list):
+                    entrys += filter_entrys(data[field],tag,value,val_aux)
+                elif field == tag and field == value:
+                    entrys += [(data[tag],data[value])]
+                    break
+                elif field == value:
+                    entrys += [(val_aux,data[value])]
+            elif isinstance(field,dict):
+                entrys += filter_entrys(field,tag,value,val_aux)
+            elif isinstance(field,list):
+                entrys += filter_entrys(field,tag,value,val_aux)
+    elif isinstance(data,list):
+        for field in data:
+            entrys += filter_entrys(field,tag,value,val_aux)   
     return entrys

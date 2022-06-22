@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-server
+  namespace: ricardo-84730
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: frontend-server
+  template:
+    metadata:
+      labels:
+        app: frontend-server
+    spec:
+      containers:
+        - name: frontend-server
+          image: registry.deti:5000/ricardo-84730/egs-frontend-server:beta
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "250m"
+          ports:
+            - containerPort: 8080
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchLabels:
+                  app: nginx
+
+# Create Service for APP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-server
+  namespace: ricardo-84730
+spec:
+  selector:
+    app: frontend-server
+  ports:
+    - port: 8080
+      targetPort: 8080
+
+# Configure Traefik
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: egs4-k3s
+  labels:
+    name: egs4-k3s
+  namespace: ricardo-84730
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/frontend-entry-points: http,https
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
+    traefik.ingress.kubernetes.io/redirect-permanent: "true"
+
+spec:
+  rules:
+    - host: egs4.k3s
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: frontend-nginx
+                port:
+                  number: 80
+          - pathType: Prefix
+            path: "/auth"
+            backend:
+              service:
+                name: ratecheckapi
+                port:
+                  number: 3555
+          - pathType: Prefix
+            path: "/notification"
+            backend:
+              service:
+                name: notification-service-main
+                port:
+                  number: 80
+          - pathType: Prefix
+            path: "/information"
+            backend:
+              service:
+                name: information
+                port:
+                  number: 80
