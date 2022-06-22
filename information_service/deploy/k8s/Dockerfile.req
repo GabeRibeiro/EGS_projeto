@@ -1,4 +1,3 @@
-# snx -s go.ua.pt -u alexandretomas@ua.pt
 # kubectl apply -f deploy/k8s/requester-secret.yaml
 # sudo docker build --tag registry.deti:5000/requester-service:v1 --file deploy/k8s/Dockerfile.req .
 # sudo docker push registry.deti:5000/requester-service:v1

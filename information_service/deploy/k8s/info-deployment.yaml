@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: information-service
-        image: registry.deti:5000/information-service:v38
+        image: registry.deti:5000/information-service:v45
         ports:
           - containerPort: 8000
         volumeMounts:

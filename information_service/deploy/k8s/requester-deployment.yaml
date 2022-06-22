@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: requester-service
-        image: registry.deti:5000/requester-service:v15
+        image: registry.deti:5000/requester-service:v16
         ports:
           - containerPort: 8000
         volumeMounts:
