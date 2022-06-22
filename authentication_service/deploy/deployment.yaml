@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: ratecheckapi
-        image: registry.deti:5000/ratecheck/bodas-api:v16
+        image: registry.deti:5000/ratecheck/bodas-api:v17
         ports:
           - containerPort: 3555
 
