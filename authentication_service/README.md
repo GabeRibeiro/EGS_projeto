@@ -1,8 +1,6 @@
-# HOW TO RUN
-
-cd deploy
-
-docker-compose up --build
+# HOW TO RUN 
+use docker build on all files inside deploy and then docker run
+yaml in deploy as well
 
 # ACCESS:
 
