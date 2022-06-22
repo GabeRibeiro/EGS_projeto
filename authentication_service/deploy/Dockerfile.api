@@ -1,5 +1,5 @@
-#sudo docker build -t registry.deti:5000/ratecheck/bodas-api:v14  -f deploy/Dockerfile.api .
-#sudo docker push registry.deti:5000/ratecheck/bodas-api:v14
+#sudo docker build -t registry.deti:5000/ratecheck/bodas-api:v19  -f deploy/Dockerfile.api .
+#sudo docker push registry.deti:5000/ratecheck/bodas-api:v19
 
 
 FROM node:18

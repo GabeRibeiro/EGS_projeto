@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { useAuth } from "../../context/AuthProvider";
-import createSocket from "../../variables/socket";
+import { useAuth } from "../../context/Auth/AuthProvider";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { classNames } from "primereact/utils";
 import "../../assets/css/FormDemo.css";
+import { useSocket } from "../../context/Socket/SocketProvider";
+
+
+const URL = 'http://notification-service-jfs4.deti.k3s'
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [pushNotifications, setPushNotifications] = useState([]);
   const auth = useAuth();
+  const { socket } = useSocket();
 
   const defaultValues = {
     text: "",
@@ -25,37 +29,35 @@ export default function Notifications() {
 
   useEffect(() => {
     console.log(auth.user.id);
-    createSocket(auth.user.id, handlePushNotification);
+    socket.on("newNotification", handleReceiveNotification);
+    return () => {
+      socket.off("newNotification", handleReceiveNotification);
+    };
   }, []);
 
-  const handlePushNotification = (notification) => {
-    console.log(notification);
-    setPushNotifications([...pushNotifications, notification]);
-  };
-
   useEffect(() => {
-    const url = new URL("http://host.docker.internal:3050/notifications");
 
-    fetch(url, {
+    fetch(URL + "/notification", {
       headers: {
-        Authorization: auth.user,
+        Authorization: auth.user.id,
       },
     })
       .then((response) => response.json())
       .then((data) => {
-        setNotifications(data);
+        setPushNotifications(data);
       })
       .catch((err) => {
         console.error("Error:", err);
       });
   }, []);
 
+  const handleReceiveNotification = (notification) => {
+    console.log(notification);
+    setNotifications([...pushNotifications, notification]);
+  };
+
   const handleNewNotification = async (values) => {
-    // const headers = {
-    //   Authorization: auth.user,
-    //   Content,
-    // };
-    const url = new URL("http://host.docker.internal:3050/notification");
+
 
     const data = {
       text: values.text,
@@ -64,7 +66,7 @@ export default function Notifications() {
     };
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch(URL + "/notifications", {
         method: "POST",
         headers: {
           Authorization: auth.user.id,
@@ -151,8 +153,14 @@ export default function Notifications() {
           <Button type="submit" label="Submit" className="mt-2" />
         </form>
       </div>
-      <h1> Notifications sended</h1>
+      <h1> Notifications sended </h1>
       {pushNotifications.map((notification, index) => (
+        <div key={index}>
+          <span>Value: {notification.txt}</span>
+        </div>
+      ))}
+      <h1> Notifications Received </h1>
+      {notifications.map((notification, index) => (
         <div key={index}>
           <span>User: {notification.uid}</span>
           <span>Value: {notification.txt}</span>

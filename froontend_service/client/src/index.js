@@ -9,25 +9,28 @@ import Main from "./layouts/Main";
 import LoginForm from "./components/Profile/LoginForm";
 import RegisterForm from "./components/Profile/RegisterForm";
 import Auth from "./layouts/Auth";
-import RequireAuth from "./context/RequireAuth";
-import AuthProvider from "./context/AuthProvider";
+import RequireAuth from "./context/Auth/RequireAuth";
+import AuthProvider from "./context/Auth/AuthProvider";
+import SocketProvider from "./context/Socket/SocketProvider";
+import { CookiesProvider } from "react-cookie";
 import Notifications from "./components/TabComponents/Notifications";
 import Tab from "./components/TabComponents/Tab";
+import Home from "./components/Home"
 
 ReactDOM.render(
   <StrictMode>
     <Router>
+    <CookiesProvider>
       <AuthProvider>
         <Routes>
-          <Route element={<Auth />}>
-            <Route path="/auth/login" element={<LoginForm />} />
-            <Route path="/auth/register" element={<RegisterForm />} />
-          </Route>
-
+        <Route path="/home" element={<Home />}/>
           <Route
             element={
+              
               <RequireAuth>
-                <Main />
+                <SocketProvider>
+                  <Main />
+                </SocketProvider>
               </RequireAuth>
             }
           >
@@ -36,6 +39,7 @@ ReactDOM.render(
           </Route>
         </Routes>
       </AuthProvider>
+      </CookiesProvider>
     </Router>
   </StrictMode>,
   document.getElementById("root")

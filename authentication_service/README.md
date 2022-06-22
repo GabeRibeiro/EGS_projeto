@@ -1,11 +1,11 @@
-# HOW TO RUN
-
-cd deploy
-
-docker-compose up --build
+# HOW TO RUN 
+use docker build on all files inside deploy and then docker run
+yaml in deploy as well
 
 # ACCESS:
 
-localhost:3000/register
+localhost:3555/register
 
-localhost:3000/login
+localhost:3555/login
+
+localhost:3555/verifyToken

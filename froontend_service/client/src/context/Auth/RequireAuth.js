@@ -7,7 +7,7 @@ export default function RequireAuth({ children }) {
   let location = useLocation();
 
   if (!auth.user) {
-    return <Navigate to="/auth/login" state={{ from: location }} replace />;
+    return <Navigate to="/home" state={{ from: location }} replace />;
   }
 
   return children;

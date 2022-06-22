@@ -1,0 +1,13 @@
+services:
+  fronteend-api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.server-api
+    image: egs-frontend-server
+  client:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.client
+    image: egs-frontend-client
+    ports:
+      - "3015:80"
