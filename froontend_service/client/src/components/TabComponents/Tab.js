@@ -6,8 +6,8 @@ import Searcher from "./CryptoSearcher/Searcher";
 
 export default function Tab() {
   return (
-    <div className="mt-5 flex justify-content-center align-content-center ">
+    <Card>
       <Searcher></Searcher>
-    </div>
+    </Card>
   );
 }
