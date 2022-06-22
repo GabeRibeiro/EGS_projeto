@@ -15,6 +15,7 @@ import SocketProvider from "./context/Socket/SocketProvider";
 import { CookiesProvider } from "react-cookie";
 import Notifications from "./components/TabComponents/Notifications";
 import Tab from "./components/TabComponents/Tab";
+import Home from "./components/Home"
 
 ReactDOM.render(
   <StrictMode>
@@ -22,11 +23,7 @@ ReactDOM.render(
     <CookiesProvider>
       <AuthProvider>
         <Routes>
-          {/* <Route element={<Auth />}>
-            <Route path="/auth/login" element={<LoginForm />} />
-            <Route path="/auth/register" element={<RegisterForm />} />
-          </Route> */}
-
+        <Route path="/home" element={<Home />}/>
           <Route
             element={
               

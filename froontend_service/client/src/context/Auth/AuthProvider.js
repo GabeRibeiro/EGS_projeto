@@ -11,34 +11,13 @@ export default function AuthProvider({ children }) {
   let [user, setUser] = useState(null);
   const [cookies, setCookie] = useCookies();
 
-  setUser({ id: cookies.jwt_token });
+  // 
 
-  // async function signIn(user, cb) {
-  //   // call Athentication API to sign in
-  //   try {
-  //     const response = await fetch("/auth/login", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(user),
-  //     });
-
-  //     const jwt = await response.text();
-
-  //     console.log(jwt);
-
-  //     if (response.ok) {
-  //       setUser({ id: jwt });
-  //       cb(false);
-  //     } else {
-  //       cb(true, "Invalid email or password");
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //     cb(true);
-  //   }
-  // }
+  async function signIn(user, cb) {
+    // call Athentication API to sign in
+    setUser({ id: cookies.jwt_token });
+    cb()
+  }
 
   async function signOut(cb) {
     // call Athentication API to sign out
@@ -76,7 +55,7 @@ export default function AuthProvider({ children }) {
   //   }
   // }
 
-  let value = { user, signOut };
+  let value = { user, signOut, signIn };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -9,6 +9,7 @@ export function useSocket() {
   return useContext(SocketContext);
 }
 
+const URL = 'http://notification-service-jfs4.deti.k3s'
 
 
 export default function SocketProvider({ children }) {
@@ -18,7 +19,7 @@ export default function SocketProvider({ children }) {
   useEffect(() => {
     const id = jwt_decode(user.id)["_id"];
     setSocket(
-      socketIOClient("/notification", {
+      socketIOClient(URL + "/notification", {
         transports: ["websocket"],
         auth: {
           token: id,

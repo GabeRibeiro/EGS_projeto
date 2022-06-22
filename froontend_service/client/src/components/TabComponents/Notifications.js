@@ -8,6 +8,8 @@ import "../../assets/css/FormDemo.css";
 import { useSocket } from "../../context/Socket/SocketProvider";
 
 
+const URL = 'http://notification-service-jfs4.deti.k3s'
+
 export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [pushNotifications, setPushNotifications] = useState([]);
@@ -35,7 +37,7 @@ export default function Notifications() {
 
   useEffect(() => {
 
-    fetch("/notification/notification", {
+    fetch(URL + "/notification", {
       headers: {
         Authorization: auth.user.id,
       },
@@ -64,7 +66,7 @@ export default function Notifications() {
     };
 
     try {
-      const response = await fetch("/notification/notifications", {
+      const response = await fetch(URL + "/notifications", {
         method: "POST",
         headers: {
           Authorization: auth.user.id,
