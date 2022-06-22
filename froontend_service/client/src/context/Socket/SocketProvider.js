@@ -1,7 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
-import socketIOClient from "socket.io-client";
-import jwt_decode from "jwt-decode";
+import React, { useContext, useEffect, useCallback } from "react";
+import io from "socket.io-client";
 import { useAuth } from "../Auth/AuthProvider";
+
+const URL = "http://notification-service-jfs4.k3s/";
 
 const SocketContext = React.createContext();
 
@@ -9,40 +10,37 @@ export function useSocket() {
   return useContext(SocketContext);
 }
 
-const URL = 'http://notification-service-jfs4.deti.k3s'
-
-
 export default function SocketProvider({ children }) {
-  const [socket, setSocket] = useState(null);
-  const user = useAuth();
+  const auth = useAuth();
 
-  useEffect(() => {
-    const id = jwt_decode(user.id)["_id"];
-    setSocket(
-      socketIOClient(URL + "/notification", {
-        transports: ["websocket"],
-        auth: {
-          token: id,
-        },
-      })
-    );
+  const socket = io(URL, {
+    transports: ["websocket"],
+    auth: {
+      token: auth.user.token,
+    },
+  });
 
-    socket.on("connect_error", (err) => {
-      console.error(`Socket connection error: ${err}`);
-      alert(`Socket connection error: ${err}`);
-    });
-
-    socket.on("newNotification", (newNotification) => {
-      console.log(newNotification);
-    });
-
-    return () => socket.close();
+  const err = useCallback((err) => {
+    console.error(`Socket connection error: ${err}`);
+    alert(`Socket connection error: ${err}`);
   }, []);
 
+  const newNot = useCallback((newNotification) => {
+    console.log(newNotification);
+  }, []);
 
-  const data = { socket };
+  useEffect(() => {
+    socket.on("connect_error", err);
+
+    socket.on("newNotification", newNot);
+
+    return () => {
+      socket.off("connect_error", err);
+      socket.off("newNotification", newNot);
+    };
+  }, [socket, newNot, err]);
 
   return (
-    <SocketContext.Provider value={data}>{children}</SocketContext.Provider>
+    <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
   );
 }

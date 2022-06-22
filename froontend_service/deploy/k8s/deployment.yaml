@@ -4,7 +4,7 @@ metadata:
   name: frontend-server
   namespace: egs4
 spec:
-  replicas: 5
+  replicas: 3
   selector:
     matchLabels:
       app: frontend-server
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend-server
-          image: registry.deti:5000/ricardo-84730/egs-frontend-server:betav7
+          image: registry.deti:5000/egs4/frontend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -31,6 +31,7 @@ spec:
 ---
 apiVersion: v1
 kind: Service
+
 metadata:
   name: frontend-server
   namespace: egs4
@@ -59,6 +60,36 @@ metadata:
 spec:
   rules:
     - host: egs4.k3s
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: frontend-nginx
+                port:
+                  number: 80
+    - host: ratecheck-auth.k3s
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: nginx
+                port:
+                  number: 80
+    - host: information-service.k3s
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: information-service
+                port:
+                  number: 80
+    - host: notification-service-jfs4.k3s
       http:
         paths:
           - pathType: Prefix

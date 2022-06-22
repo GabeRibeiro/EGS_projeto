@@ -1,7 +1,5 @@
 
-from flask import Flask, render_template, request, redirect, Response, make_response
-
-import requests as api_calls
+from flask import Flask, render_template, request, redirect, make_response
 
 app = Flask(__name__, static_folder='build/static', template_folder='build')
 
@@ -13,14 +11,7 @@ def get_index():
 
   # check if theres authentication header
   if token == None:
-    return redirect('cd')
-    
-  # check if the token is valid with Authentication Api
-  # valid = api_calls.post('http://ratecheck.auth.k3s//validate',
-  #   headers={'auth-token': request.headers['auth-token']})  
-  
-  # if valid.status_code != 200:
-  #   return Response(status=403)
+    return redirect('http://ratecheck-auth.k3s/login')
   
   res = make_response(render_template('index.html'))
   res.set_cookie('jwt_token', token )

@@ -10,19 +10,7 @@ import "primeicons/primeicons.css";
 export default function Navbar() {
   const navigate = useNavigate();
   const auth = useAuth();
-  const { socket } = useSocket();
-
-  const [notifications, setNotifications] = useState(0);
-
-  const handleNotifications = (notification) =>
-    setNotifications(notifications + 1);
-
-  useEffect(() => {
-    socket.on("newNotification", handleNotifications);
-    return () => {
-      socket.off("newNotification", handleNotifications);
-    };
-  }, []);
+  const socket = useSocket();
 
   const items = [];
 
@@ -52,7 +40,6 @@ export default function Navbar() {
             color: "yellow",
           }}
         ></i>
-        <span style={{ fontSize: "0.5em" }}> {notifications} </span>
       </Link>
       <Button
         type="button"
