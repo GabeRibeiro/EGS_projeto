@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: ratecheckapi
-        image: registry.deti:5000/ratecheck/bodas-api:v18
+        image: registry.deti:5000/ratecheck/bodas-api:v19
         ports:
           - containerPort: 3555
 
@@ -108,7 +108,7 @@ metadata:
     traefik.ingress.kubernetes.io/redirect-permanent: "true"
 spec:
   rules:
-  - host: ratecheck.auth
+  - host: ratecheck.auth.k3s
     http:
       paths:
       - path: /
