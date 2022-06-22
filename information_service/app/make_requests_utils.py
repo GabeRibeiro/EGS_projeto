@@ -5,7 +5,11 @@ from datetime import datetime as dt
 tokens = {}
 
 def request_basic(metric_id,url,value,tag):
-    request = requests.get(url,timeout=40)
+    try:
+        request = requests.get(url,timeout=40)
+    except:
+        print('Connection error')
+        return
     if request.status_code < 400: 
         try:
             db_entrys = filter_entrys(request.json(),tag,value)
@@ -38,7 +42,11 @@ def request_basic(metric_id,url,value,tag):
     return False
 
 def request_key(metric_id,url,value,tag,key,name):           
-    request = requests.get(url,headers={name: key},timeout=40)
+    try:
+        request = requests.get(url,headers={name: key},timeout=40)
+    except:
+        print('Connection error')
+        return
     if request.status_code < 400:
             try:
                 db_entrys = filter_entrys(request.json(),tag,value)
@@ -73,7 +81,11 @@ def request_key(metric_id,url,value,tag,key,name):
     return False
 
 def request_http(metric_id,url,value,tag,username,key):      
-    request = requests.get(url,headers={"username": username , "password": key},timeout=40)
+    try:
+        request = requests.get(url,headers={"username": username , "password": key},timeout=40)
+    except:
+        print('Connection error')
+        return
     if request.status_code < 400:    
         try:
             db_entrys = filter_entrys(request.json(),tag,value)
@@ -113,7 +125,11 @@ def request_token(metric_id,url,value,tag,token_url,key,secret,content_type,auth
     if metric_id in tokens:
         token = tokens[metric_id]
     else:
-        request = requests.post(token_url,headers={'Content-Type': content_type, 'Authorization': 'Basic '+msg},timeout=15)
+        try:
+            request = requests.post(token_url,headers={'Content-Type': content_type, 'Authorization': 'Basic '+msg},timeout=15)
+        except:
+            print('Connection error')
+            return
         if request.status_code<300:
             token = auth_type + ' ' + request.json()['access_token']
             tokens[metric_id] = token
@@ -139,13 +155,24 @@ def request_token(metric_id,url,value,tag,token_url,key,secret,content_type,auth
         if period<60:
             tokens[metric_id] = token
         
-    request = requests.get(url,headers={'Authorization': token},timeout=40)
+    try:
+        request = requests.get(url,headers={'Authorization': token},timeout=40)
+    except:
+        print('Connection error')
+        return
     if request.status_code == 401 and period<60:
-        request = requests.post(token_url,headers={'Content-Type': content_type, 'Authorization': 'Basic '+msg},timeout=15)
+        try:
+            request = requests.post(token_url,headers={'Content-Type': content_type, 'Authorization': 'Basic '+msg},timeout=15)
+        except:
+            print('Connection error')
+            return
         token = auth_type + ' ' + request.json()['access_token']
         tokens[metric_id] = token
-        request = requests.get(url,headers={'Authorization': token},timeout=40)
-    
+        try:
+            request = requests.get(url,headers={'Authorization': token},timeout=40)
+        except:
+            print('Connection error')
+            return
     if request.status_code < 400:
         try:
             db_entrys = filter_entrys(request.json(),tag,value)
