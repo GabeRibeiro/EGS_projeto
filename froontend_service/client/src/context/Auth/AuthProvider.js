@@ -1,5 +1,6 @@
 import React, { useContext, useState } from "react";
 import { useCookies } from "react-cookie";
+import jwt_decode from "jwt-decode";
 
 const AuthContext = React.createContext();
 
@@ -9,53 +10,27 @@ export function useAuth() {
 
 export default function AuthProvider({ children }) {
   let [user, setUser] = useState(null);
-  const [cookies, setCookie] = useCookies();
-
-  // 
-
-  async function signIn(user, cb) {
+  const [cookies, setCookie] = useCookies(["jwt_token"]);
+  const token = cookies["jwt_token"];
+  console.log(cookies);
+  function signIn(cb) {
     // call Athentication API to sign in
-    setUser({ id: cookies.jwt_token });
-    cb()
+    setUser({ token: token });
+    cb();
   }
 
-  async function signOut(cb) {
+  function getId() {
+    const id = jwt_decode(user.token)["_id"];
+    return id;
+  }
+
+  function signOut(cb) {
     // call Athentication API to sign out
     setUser(null);
     cb();
   }
 
-  // async function register(user, cb) {
-  //   // call Authentication API to register
-
-  //   try {
-  //     const response = await fetch("/auth/register", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(user),
-  //     });
-
-  //     if (response.ok) {
-  //       const data = await response.json();
-
-  //       console.log(data);
-
-  //       cb(false);
-  //     } else {
-  //       const message = await response.text();
-  //       if (message == null || message.includes("html"))
-  //         message = "Email or Password is invalid";
-  //       cb(true, message);
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //     cb(true);
-  //   }
-  // }
-
-  let value = { user, signOut, signIn };
+  let value = { user, getId, signOut, signIn };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

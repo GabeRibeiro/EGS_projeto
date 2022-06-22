@@ -6,15 +6,15 @@ import { Button } from "primereact/button";
 import { classNames } from "primereact/utils";
 import "../../assets/css/FormDemo.css";
 import { useSocket } from "../../context/Socket/SocketProvider";
+import { Card } from "primereact/card";
 
-
-const URL = 'http://notification-service-jfs4.deti.k3s'
+const URL = "http://notification-service-jfs4.k3s";
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [pushNotifications, setPushNotifications] = useState([]);
   const auth = useAuth();
-  const { socket } = useSocket();
+  const socket = useSocket();
 
   const defaultValues = {
     text: "",
@@ -28,48 +28,43 @@ export default function Notifications() {
   } = useForm({ defaultValues });
 
   useEffect(() => {
-    console.log(auth.user.id);
+    const handleReceiveNotification = (notification) => {
+      setNotifications([...notifications, notification]);
+    };
     socket.on("newNotification", handleReceiveNotification);
     return () => {
       socket.off("newNotification", handleReceiveNotification);
     };
-  }, []);
+  }, [socket, notifications]);
 
   useEffect(() => {
-
-    fetch(URL + "/notification", {
+    fetch(URL + "/notifications", {
       headers: {
-        Authorization: auth.user.id,
+        Authorization: auth.user.token,
       },
     })
       .then((response) => response.json())
       .then((data) => {
-        setPushNotifications(data);
+        let result = JSON.parse(data);
+        setPushNotifications(result);
       })
       .catch((err) => {
         console.error("Error:", err);
       });
-  }, []);
-
-  const handleReceiveNotification = (notification) => {
-    console.log(notification);
-    setNotifications([...pushNotifications, notification]);
-  };
+  }, [auth.user.token]);
 
   const handleNewNotification = async (values) => {
-
-
     const data = {
-      text: values.text,
-      uid: "1",
-      options: { email: values.email },
+      text: "oi",
+      uid: auth.getId(),
+      options: {},
     };
 
     try {
-      const response = await fetch(URL + "/notifications", {
+      const response = await fetch(URL + "/notification", {
         method: "POST",
         headers: {
-          Authorization: auth.user.id,
+          Authorization: auth.getId(),
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
@@ -93,14 +88,13 @@ export default function Notifications() {
           onSubmit={handleSubmit(handleNewNotification)}
           className="p-fluid"
         >
-          <div className="field">
+          <div className="field pb-1 ">
             <span className="p-float-label p-input-icon-right">
               <i className="pi pi-envelope" />
               <Controller
                 name="email"
                 control={control}
                 rules={{
-                  required: "Email is required.",
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
                     message: "Invalid email address. E.g. example@email.com",
@@ -125,7 +119,7 @@ export default function Notifications() {
             </span>
             {getFormErrorMessage("email")}
           </div>
-          <div className="field">
+          <div className="field pb-1">
             <span className="p-float-label">
               <Controller
                 name="text"
@@ -161,10 +155,12 @@ export default function Notifications() {
       ))}
       <h1> Notifications Received </h1>
       {notifications.map((notification, index) => (
-        <div key={index}>
-          <span>User: {notification.uid}</span>
-          <span>Value: {notification.txt}</span>
-        </div>
+        <Card title={"Notification: " + index} key={index} className="mt-2 mx-2">
+          <div className="flex flex-column align-items-start">
+            <span>User: {notification.uid}</span>
+            <span>Value: {notification.txt}</span>
+          </div>
+        </Card>
       ))}
     </>
   );
