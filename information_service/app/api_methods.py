@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import mysql.connector
 from flaskext.mysql import MySQL
 from flask_restful import Api,Resource,reqparse,abort
@@ -8,6 +9,11 @@ from datetime import datetime
 from functools import wraps
 
 app = Flask(__name__)
+
+cors = CORS(app, resources={ r'/*': {'origins': ["http://egs4.k3s/","localhost:3000"]}}, supports_credentials=True)
+#CORS_EXPOSE_HEADERS="*,*"
+#CORS_ALLOW_HEADERS="content-type,*"
+#cors = CORS(app, origins=["http://egs4.k3s/","localhost:3000"], allow_headers=CORS_ALLOW_HEADERS.split(",") , expose_headers= CORS_EXPOSE_HEADERS.split(","),   supports_credentials = True)
 
 host = ""
 user = ""
@@ -399,7 +405,7 @@ class Query:
         cursor = db.cursor()
         cursor.execute("USE "+database)
         val = [metric_id,user_id]
-        sql = 'SELECT tag FROM Basic_url WHERE metric_id = %s AND user_id = %s'
+        sql = 'SELECT DISTINCT Value.tag FROM Value,Basic_url WHERE url_id = %s AND user_id = %s'
         cursor.execute(sql,val)
         values = cursor.fetchall()
         
@@ -417,7 +423,7 @@ def token_required(f):
         
         val = requests.get(verify_url,headers={"auth-token":token})
         if val.status_code != 200:
-            return jsonify({'message': 'Token is invalid'}),403
+            return jsonify({'message': 'Token is invalid'}),401
         
         return f(*args, **kwargs)
     return decorated

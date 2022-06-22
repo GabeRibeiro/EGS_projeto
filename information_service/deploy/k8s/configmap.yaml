@@ -8,8 +8,8 @@ data:
   SERVER_PORT: "3306"
   # DB access credentials
   SQLHOST: "information-service-db-service"
-  SQLDATABASE: "mysql"
-  SQLUSER: "mysql"
+  SQLDATABASE: "url_db"
+  SQLUSER: "root"
 ---
 # mysql DB 'exclusive' config
 apiVersion: v1
@@ -19,7 +19,7 @@ metadata:
   namespace: egs4
 data:
   # DB access credentials
-  MYSQL_USER: "mysql"
+  MYSQL_USER: "root"
   MYSQL_DB: "mysql"
 
   init.sql: |
