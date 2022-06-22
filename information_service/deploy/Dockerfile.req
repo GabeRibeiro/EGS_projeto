@@ -1,14 +1,15 @@
-# sudo docker build --tag requester --file deploy/Dockerfile.req .
-
+# kubectl apply -f deploy/k8s/requester-secret.yaml
+# sudo docker build --tag registry.deti:5000/requester-service:v1 --file deploy/k8s/Dockerfile.req .
+# sudo docker push registry.deti:5000/requester-service:v1
+# kubectl apply -f deploy/k8s/requester-deployment.yaml
 FROM python:3.8-alpine
 
 MAINTAINER Alexandre Oliveira
 
 LABEL version="1.0"
 
-# Create app directory
-RUN mkdir /req
-WORKDIR /req
+RUN mkdir /app
+WORKDIR /app
 
 COPY app/requirements_req.txt requirements_req.txt
 
@@ -16,13 +17,10 @@ RUN python3 -m pip install --upgrade pip
 RUN pip install -r requirements_req.txt
 
 COPY app/utils.py utils.py
-COPY app/config.py config.py
-COPY app/config.json config.json
 COPY app/make_requests.py make_requests.py
 COPY app/make_requests_utils.py make_requests_utils.py
 COPY app/requests.sh requests.sh
 
-#EXPOSE 8080/tcp
-
 RUN chmod +x requests.sh  
-ENTRYPOINT ["./requests.sh"]
+
+CMD ["./requests.sh"]
